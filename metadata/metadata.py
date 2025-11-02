@@ -6,6 +6,14 @@ from datetime import datetime
 # HEIC 포맷 지원 등록
 register_heif_opener()
 
+# ============================================
+# ✅ 현재 파일 기준으로 프로젝트 루트 경로 자동 계산
+# ============================================
+# metadata.py 파일이 group5_project/metadata/ 안에 있으니까,
+# 상위 폴더(../)로 올라가면 group5_project 루트 폴더가 됨
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+TEST_IMAGE_DIR = os.path.join(PROJECT_ROOT, "metadata", "test_image")  # 예시 경로
+
 
 def quick_photo_summary(file_path):
     """
@@ -156,13 +164,9 @@ def check_gps_in_bbox(file_path):
     print("=" * 50)
 
 
-# 사용 예시
 if __name__ == "__main__":
-
-    file_path = "your image path"
-
-    # "C:/Users/Seung/Desktop/Dacon/dataset/photo/IMG_0954.HEIC"
-    # "C:/Users/Seung/Documents/카카오톡 받은 파일/test4.jpg"
+    # 루트 기준 상대경로 지정
+    file_path = os.path.join(TEST_IMAGE_DIR, "test1.HEIC")  # or "test2.jpg"
 
     if os.path.exists(file_path):
         quick_photo_summary(file_path)

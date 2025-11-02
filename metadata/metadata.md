@@ -1,41 +1,47 @@
-# 한국어 감정 분류 프로젝트 (Korean Sentiment Classification)
+# 📸 HEIC/JPG 메타데이터 기반 이미지 검증 시스템
 
-Boostcamp AI Tech 8기 | NAVER Connect Foundation  
-한국어 리뷰 데이터를 기반으로 4단계 감정(강부정, 약부정, 약긍정, 강긍정)을 분류하는 Transformer 기반 NLP 프로젝트입니다.
-
----
-
-## 🔍 프로젝트 개요
-- 목표: 텍스트의 **감정 방향(긍/부정)** 및 **강도(약/강)** 분류
-- 데이터: 약 279,650건의 한국어 리뷰 데이터
-- 클래스 불균형 비율: 약 4.19:1
-- 기간: 2025.10.23 ~ 10.31  
-- 플랫폼: NAVER AI Stages (Ubuntu 20.04 / GPU 환경)
+파주 지역 촬영 사진의 메타데이터(EXIF)를 기반으로  
+**촬영 시각·GPS 좌표·BBox(위치 유효성)** 를 검증하는 Python 유틸리티입니다.
 
 ---
 
-## 🚀 주요 특징
+## 주요 기능
 
-| 항목 | 설명 |
-|------|------|
-| **언어 모델** | kykim/bert-kor-base, monologg/koelectra-base-v3, klue/bert-base, kcbert-base, klue/roberta-base |
-| **학습 구조** | Stratified 5-Fold 교차 검증 |
-| **모델 헤드 구조** | Polarity(긍/부정) + Intensity(강/약) 이중 헤드 구조 |
-| **앙상블** | Soft/Hard Voting, Correlation-based Stacking |
-| **최종 성능** | Validation Accuracy 0.857 / Hold-out 0.837 |
+### ✅ 3단계 검증 절차
+
+1. **촬영 시각 검증**
+   - EXIF 태그(`DateTimeOriginal`) 추출
+   - 오늘 촬영 여부(`✅ PASS / ❌ NON PASS`) 판단
+
+2. **GPS 좌표 추출**
+   - HEIC/JPG 파일의 GPS IFD에서 위도(latitude), 경도(longitude) 추출
+   - DMS(Degree, Minute, Second) → 십진수로 자동 변환
+
+3. **BBox(경계 박스) 판정**
+   - 사전에 정의된 위도/경도 범위 내에 있는지 확인
+   - 지도 링크 자동 생성 (Google Maps)
 
 ---
 
-## 🧠 모델 아키텍처
+## 지원 포맷
 
-```text
-Input Text
-  ↓
-Tokenization (BERT Tokenizer)
-  ↓
-Transformer Encoder (Pretrained Model)
-  ↓
-├── Head A: Polarity Classifier (긍/부정)
-└── Head B: Intensity Classifier (강/약)
-  ↓
-Final Combination → 4-class 감정 확률
+| 확장자 | 설명 | 지원 여부 |
+|---------|------|------------|
+| `.heic` | iPhone 촬영 기본 포맷 (HEIF) | ✅ |
+| `.jpg` / `.jpeg` | 표준 JPEG 이미지 | ✅ |
+| `.png` | 메타데이터 미보존, 분석 불가 | ⚠️ 제한적 |
+| 기타 (`.gif`, `.bmp`) | EXIF 미지원 | ❌ |
+
+---
+
+## 지원 환경
+
+✅ **Python 3.10 이상**  
+✅ **Windows / macOS / Linux (Ubuntu 20.04+)**
+
+---
+
+## 설치
+
+```bash
+pip install pillow pillow-heif

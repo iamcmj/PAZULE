@@ -17,7 +17,7 @@ TEST_IMAGE_DIR = os.path.join(PROJECT_ROOT, "metadata", "test_image")  # 예시 
 
 def quick_photo_summary(file_path):
     """
-    HEIC/JPEG 파일의 촬영 시각 + GPS 좌표 + BBox 유효성 + 오늘 여부 출력
+    HEIC/JPEG 파일의 촬영 시각 + GPS 좌표 + BBox 유효성 + 오늘 여부 출력 및 bool 반환
     """
     try:
         img = Image.open(file_path)
@@ -38,13 +38,13 @@ def quick_photo_summary(file_path):
         coords = extract_gps_coordinates(file_path)
         if not coords:
             print("\n⚠️ GPS 정보 없음 (좌표 없음)")
-            return
+            return False  # ❌ GPS 자체가 없으면 실패
 
         lat, lon = coords
         inside = is_in_bbox(lat, lon)
 
         # 오늘 날짜 비교
-        today_str = datetime.now().strftime("%Y:%m:%d")  # exif 날짜 포맷과 동일하게
+        today_str = datetime.now().strftime("%Y:%m:%d")
         is_today = date_str and date_str.startswith(today_str)
 
         # 결과 출력
@@ -57,8 +57,16 @@ def quick_photo_summary(file_path):
         print(f"📦 위치 판정: {'✅ 출판단지 내부' if inside else '❌ 출판단지 외부'}")
         print("=" * 60)
 
+        # ✅ 둘 다 만족해야 통과
+        passed = is_today and inside
+        if passed:
+            print("✅ 메타데이터 조건 통과")
+
+        return passed
+
     except Exception as e:
         print(f"❌ 처리 중 오류: {str(e)}")
+        return False
 
 
 def extract_gps_coordinates(file_path):

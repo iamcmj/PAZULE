@@ -51,12 +51,10 @@ def quick_photo_summary(file_path):
         print("\n" + "=" * 60)
         print(f"📸 파일명: {os.path.basename(file_path)}")
         print(f"🕒 촬영 시각: {date_str if date_str else '(정보 없음)'}")
-        print(
-            f"📅 오늘 여부: {'✅ PASS (오늘 촬영)' if is_today else '❌ NON PASS (오늘 아님)'}"
-        )
+        print(f"📅 오늘 여부: {'✅ 오늘 촬영' if is_today else '❌ 오늘 아님'}")
         print(f"📍 좌표: {lat:.6f}, {lon:.6f}")
         print(f"🌐 지도: https://www.google.com/maps?q={lat},{lon}")
-        print(f"📦 위치 판정: {'✅ BBox 내부' if inside else '❌ BBox 외부'}")
+        print(f"📦 위치 판정: {'✅ 출판단지 내부' if inside else '❌ 출판단지 외부'}")
         print("=" * 60)
 
     except Exception as e:
@@ -124,44 +122,6 @@ MAX_LON = 126.690022
 def is_in_bbox(lat, lon):
     """주어진 위도(lat), 경도(lon)가 BBox 내부에 있으면 True"""
     return (MIN_LAT <= lat <= MAX_LAT) and (MIN_LON <= lon <= MAX_LON)
-
-
-def check_gps_in_bbox(file_path):
-    """HEIC 또는 JPG 파일 GPS가 지정된 BBox 내부인지 확인"""
-    coords = extract_gps_coordinates(file_path)
-    if not coords:
-        print("⚠️ GPS 정보가 없습니다.")
-        return
-
-    # 날짜/시간 추출
-    img = Image.open(file_path)
-    exif = img.getexif()
-    date_str = None
-    if exif:
-        for tag_id, value in exif.items():
-            from PIL.ExifTags import TAGS
-
-            tag_name = TAGS.get(tag_id, tag_id)
-            if tag_name in ("DateTimeOriginal", "DateTime"):
-                date_str = value
-                break
-
-    lat, lon = coords
-    inside = is_in_bbox(lat, lon)
-
-    # ===========================
-    # 깔끔한 결과 출력
-    # ===========================
-    print("\n" + "=" * 50)
-    print(f"📸 파일명: {os.path.basename(file_path)}")
-    if date_str:
-        print(f"🕒 촬영 시각: {date_str}")
-    else:
-        print("🕒 촬영 시각: (정보 없음)")
-    print(f"📍 GPS: {lat:.6f}, {lon:.6f}")
-    print(f"🌐 지도: https://www.google.com/maps?q={lat},{lon}")
-    print(f"📦 위치 판정: {'✅ BBox 내부' if inside else '❌ BBox 외부'}")
-    print("=" * 50)
 
 
 if __name__ == "__main__":

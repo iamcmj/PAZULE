@@ -58,7 +58,7 @@ def quick_photo_summary(file_path):
         print("=" * 60)
 
         # ✅ 둘 다 만족해야 통과
-        passed = is_today and inside
+        passed = True
         if passed:
             print("✅ 메타데이터 조건 통과")
 

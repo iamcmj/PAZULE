@@ -34,6 +34,7 @@ def get_today_answer(admin_choice=None):
         match = next((m for m in candidates if m["answer"] == admin_choice), None)
         if match:
             answer, hint = match["answer"], match["hint"]
+            print("saksldka")
         else:
             raise ValueError(f"관리자 지정 '{admin_choice}'은 후보에 없습니다.")
     else:
@@ -56,5 +57,5 @@ def get_today_answer(admin_choice=None):
 
 
 if __name__ == "__main__":
-    answer, hint = get_today_answer()
+    answer, hint = get_today_answer(admin_choice="피노키오")
     print(f"오늘의 정답: {answer} / 힌트: {hint}")

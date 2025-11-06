@@ -58,9 +58,5 @@ def get_today_answer(admin_choice=None):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     answer, hint = get_today_answer(admin_choice="피노키오")
-=======
-    answer, hint = get_today_answer("피노키오")
->>>>>>> 4f2a9744b6d14b00fb414cf91aecd679ca49ff9e
     print(f"오늘의 정답: {answer} / 힌트: {hint}")

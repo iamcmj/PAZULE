@@ -1,2 +1,31 @@
 # macOS
 .DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual environment
+.env/
+.venv/
+env/
+venv/
+
+# VSCode / PyCharm
+.vscode/
+.idea/
+
+# Logs and checkpoints
+*.log
+*.ckpt
+*.pth
+
+# OS-specific files
+.DS_Store
+Thumbs.db

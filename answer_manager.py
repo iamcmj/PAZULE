@@ -20,13 +20,14 @@ def get_today_answer(admin_choice=None):
     today = str(date.today())
 
     # 이미 오늘 정답이 있으면 그대로 사용
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            state = json.load(f)
-            if state.get("date") == today:
-                return state["answer"], state["hint"]
-    except FileNotFoundError:
-        print("⚠️ current_answer.json이 아직 없습니다. 새로 생성합니다.")
+    if not admin_choice:
+        try:
+            with open(STATE_FILE, "r", encoding="utf-8") as f:
+                state = json.load(f)
+                if state.get("date") == today:
+                    return state["answer"], state["hint"]
+        except FileNotFoundError:
+            print("⚠️ current_answer.json이 아직 없습니다. 새로 생성합니다.")
 
     candidates = load_candidates()
 
@@ -57,5 +58,9 @@ def get_today_answer(admin_choice=None):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     answer, hint = get_today_answer(admin_choice="피노키오")
+=======
+    answer, hint = get_today_answer("피노키오")
+>>>>>>> 4f2a9744b6d14b00fb414cf91aecd679ca49ff9e
     print(f"오늘의 정답: {answer} / 힌트: {hint}")

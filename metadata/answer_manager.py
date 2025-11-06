@@ -2,8 +2,8 @@
 import json, random
 from datetime import date
 
-ANSWER_FILE = "./data/answers.json"
-STATE_FILE = "./data/current_answer.json"
+ANSWER_FILE = "../data/answers.json"
+STATE_FILE = "../data/current_answer.json"
 
 def load_candidates():
     with open(ANSWER_FILE, "r", encoding="utf-8") as f:

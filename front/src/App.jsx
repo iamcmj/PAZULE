@@ -91,16 +91,18 @@ function App() {
         body: formData,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`서버 오류: ${response.status}`);
+        // 서버에서 반환한 에러 메시지 사용
+        throw new Error(data.error || `서버 오류: ${response.status}`);
       }
 
-      const data = await response.json();
-      
       setStatus("완료!");
       setResult(data);
     } catch (err) {
-      setStatus("오류 발생: " + err.message);
+      // 서버에서 반환한 에러 메시지를 그대로 표시
+      setStatus(err.message);
       console.error("Error:", err);
     } finally {
       setLoading(false);

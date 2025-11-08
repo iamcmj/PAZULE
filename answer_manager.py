@@ -27,12 +27,12 @@ def load_missions2():
 def get_today_answer(admin_choice=None, mission_type=None):
     """
     오늘의 정답과 힌트를 가져옵니다.
-    
+
     Args:
         admin_choice (str, optional): 관리자가 지정한 정답
         mission_type (str, optional): 미션 타입 ("photo" -> missions2, "location" -> missions1)
                                      None이면 missions1 사용 (기본값)
-    
+
     Returns:
         tuple: (answer, hint)
     """
@@ -71,72 +71,100 @@ def get_today_answer(admin_choice=None, mission_type=None):
     return answer, hint
 
 
-def get_today_answers():
+def get_today_answers(admin_choice1=None, admin_choice2=None):
     """
     오늘의 정답과 두 가지 힌트(missions1, missions2)를 모두 가져옵니다.
-    같은 answer를 사용하되, missions1과 missions2에서 각각 다른 hint를 가져옵니다.
-    
+    missions1과 missions2에서 각각 독립적으로 answer와 hint를 선택합니다.
+
+    Args:
+        admin_choice1 (str, optional): 관리자가 지정한 missions1 정답
+        admin_choice2 (str, optional): 관리자가 지정한 missions2 정답
+
     Returns:
-        tuple: (answer, hint1, hint2)
+        tuple: (mission1_answer, mission2_answer, hint1, hint2)
     """
     today = str(date.today())
-    
+
     # ✅ data 폴더 없으면 자동 생성
     os.makedirs(DATA_DIR, exist_ok=True)
-    
+
     # 파일이 존재하고 비어있지 않은 경우에만 읽기 시도
-    if os.path.exists(STATE_FILE) and os.path.getsize(STATE_FILE) > 0:
-        try:
-            with open(STATE_FILE, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-                if content:  # 내용이 있는 경우에만 파싱 시도
-                    state = json.loads(content)
-                    if state.get("date") == today:
-                        # 오늘 날짜면 기존 값 반환
-                        answer = state.get("answer")
-                        hint = state.get("hint")
-                        hint2 = state.get("hint2")
-                        if answer and hint and hint2:
-                            return answer, hint, hint2
-        except (json.JSONDecodeError, ValueError, KeyError) as e:
-            # JSON 파싱 오류나 잘못된 형식일 경우 새로 생성
-            print(f"⚠️ 상태 파일 형식 오류: {e}. 새로 생성합니다.")
-        except Exception as e:
-            # 기타 오류
-            print(f"⚠️ 상태 파일 읽기 오류: {e}. 새로 생성합니다.")
-    
+    if not admin_choice1 and not admin_choice2:
+        if os.path.exists(STATE_FILE) and os.path.getsize(STATE_FILE) > 0:
+            try:
+                with open(STATE_FILE, "r", encoding="utf-8") as f:
+                    content = f.read().strip()
+                    if content:  # 내용이 있는 경우에만 파싱 시도
+                        state = json.loads(content)
+                        if state.get("date") == today:
+                            # 오늘 날짜면 기존 값 반환
+                            answer1 = state.get("answer1") or state.get(
+                                "answer"
+                            )  # 하위 호환성
+                            answer2 = state.get("answer2")
+                            hint1 = state.get("hint") or state.get(
+                                "hint1"
+                            )  # 하위 호환성
+                            hint2 = state.get("hint2")
+                            if answer1 and answer2 and hint1 and hint2:
+                                return answer1, answer2, hint1, hint2
+            except (json.JSONDecodeError, ValueError, KeyError) as e:
+                # JSON 파싱 오류나 잘못된 형식일 경우 새로 생성
+                print(f"⚠️ 상태 파일 형식 오류: {e}. 새로 생성합니다.")
+            except Exception as e:
+                # 기타 오류
+                print(f"⚠️ 상태 파일 읽기 오류: {e}. 새로 생성합니다.")
+
     # 새로운 정답 생성
-    # missions1에서 answer와 hint1 선택
+    # missions1에서 answer1과 hint1 선택
     missions1_candidates = load_missions1()
-    missions1_choice = random.choice(missions1_candidates)
-    answer = missions1_choice["answer"]
-    hint1 = missions1_choice["hint"]
-    
-    # 같은 answer를 가진 missions2 항목 찾기
-    missions2_candidates = load_missions2()
-    missions2_match = next((m for m in missions2_candidates if m["answer"] == answer), None)
-    
-    if missions2_match:
-        # 같은 answer가 있으면 그 hint 사용
-        hint2 = missions2_match["hint"]
+    if admin_choice1:
+        missions1_match = next(
+            (m for m in missions1_candidates if m["answer"] == admin_choice1), None
+        )
+        if missions1_match:
+            answer1 = missions1_match["answer"]
+            hint1 = missions1_match["hint"]
+        else:
+            raise ValueError(
+                f"관리자 지정 missions1 '{admin_choice1}'은 후보에 없습니다."
+            )
     else:
-        # 같은 answer가 없으면 missions2에서 랜덤 선택 (answer는 missions1의 것을 사용)
+        missions1_choice = random.choice(missions1_candidates)
+        answer1 = missions1_choice["answer"]
+        hint1 = missions1_choice["hint"]
+
+    # missions2에서 answer2와 hint2 선택 (독립적으로)
+    missions2_candidates = load_missions2()
+    if admin_choice2:
+        missions2_match = next(
+            (m for m in missions2_candidates if m["answer"] == admin_choice2), None
+        )
+        if missions2_match:
+            answer2 = missions2_match["answer"]
+            hint2 = missions2_match["hint"]
+        else:
+            raise ValueError(
+                f"관리자 지정 missions2 '{admin_choice2}'은 후보에 없습니다."
+            )
+    else:
         missions2_choice = random.choice(missions2_candidates)
+        answer2 = missions2_choice["answer"]
         hint2 = missions2_choice["hint"]
-        # answer는 missions1에서 선택한 것을 그대로 사용
-    
+
     # 상태 저장
     state = {
         "date": today,
-        "answer": answer,
-        "hint": hint1,  # missions1 힌트
-        "hint2": hint2  # missions2 힌트
+        "answer1": answer1,  # missions1 정답
+        "answer2": answer2,  # missions2 정답
+        "hint1": hint1,  # missions1 힌트
+        "hint2": hint2,  # missions2 힌트
     }
-    
+
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
-    
-    return answer, hint1, hint2
+
+    return answer1, answer2, hint1, hint2
 
 
 if __name__ == "__main__":

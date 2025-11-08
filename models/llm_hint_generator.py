@@ -67,7 +67,8 @@ def generate_hint(answer, blip_failed_questions=None, clip_emotions=None, missio
 5. CLIP 감정 분석 결과와 정답이 가진 감성의 차이를 활용하세요
 6. 미션 상태 정보가 있다면 이를 반영하여 힌트를 작성하세요 (예: 장소는 맞지만 감정이 다르다면, 감정 측면에 집중)
 7. 사용자가 다시 도전하고 싶은 마음이 들도록 격려하세요
-8. 한국어로 작성하세요"""
+8. 한국어로 작성하세요
+9. 호들갑 떨지 말아줘"""
     
     user_prompt = f"""정답 랜드마크: {answer}
 {status_info}{blip_info}{clip_info}
@@ -81,7 +82,7 @@ def generate_hint(answer, blip_failed_questions=None, clip_emotions=None, missio
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            temperature=0.8,  # 창의적인 힌트를 위해 높은 temperature 설정
+            temperature=0.6,  # 창의적인 힌트를 위해 높은 temperature 설정
             max_tokens=200
         )
         

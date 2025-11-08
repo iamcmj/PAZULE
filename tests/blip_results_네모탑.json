@@ -1,0 +1,849 @@
+{
+  "landmark": "네모탑",
+  "threshold": 0.7,
+  "total_images": 26,
+  "success_count": 25,
+  "average_accuracy": 0.7769230769230769,
+  "results": [
+    {
+      "image": "1685886446687.jpg",
+      "true_count": 17,
+      "false_count": 3,
+      "true_ratio": 0.85,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "20210413＿152726.jpg",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "20221002_112656.jpg",
+      "true_count": 18,
+      "false_count": 2,
+      "true_ratio": 0.9,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "22-05-17_DSC06296.jpg",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "IMG_8411.jpg",
+      "true_count": 14,
+      "false_count": 6,
+      "true_ratio": 0.7,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "SE-0bb33e5a-8ad9-4466-9e4e-d725573fad47.jpg",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "SE-c1d53031-dc4a-4a98-833b-5b72ac518717.jpg",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "image_4919719771491473087251.jpg",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "wrtFileImageView.jpg",
+      "true_count": 19,
+      "false_count": 1,
+      "true_ratio": 0.95,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "파주출판단지_5349.jpg",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does the sculpture only use dark colors?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "image (2).png",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "스크린샷 2025-11-01 092450.png",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "3.jfif",
+      "true_count": 14,
+      "false_count": 6,
+      "true_ratio": 0.7,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does each layer have a square opening on the front?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "DSC02125.jfif",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "DSC09825.jfif",
+      "true_count": 17,
+      "false_count": 3,
+      "true_ratio": 0.85,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "IMG_0558.jfif",
+      "true_count": 14,
+      "false_count": 6,
+      "true_ratio": 0.7,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does each layer have a square opening on the front?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "IMG_1512.jfif",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is there a prominent human-shaped statue in the picture?",
+          "expected": "no",
+          "got": "yes"
+        },
+        {
+          "question": "Does the background show a place with many books?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "IMG_4800.jfif",
+      "true_count": 14,
+      "false_count": 6,
+      "true_ratio": 0.7,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "images (1).jfif",
+      "true_count": 17,
+      "false_count": 3,
+      "true_ratio": 0.85,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does the color look like rusty metal?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "images (2).jfif",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does each layer have a square opening on the front?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "images (3).jfif",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is there a prominent human-shaped statue in the picture?",
+          "expected": "no",
+          "got": "yes"
+        },
+        {
+          "question": "Does the statue have a particularly long nose?",
+          "expected": "no",
+          "got": "yes"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "images.jfif",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is there a prominent human-shaped statue in the picture?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "꾸미기-0D0A8921.jfif",
+      "true_count": 13,
+      "false_count": 7,
+      "true_ratio": 0.65,
+      "is_success": false,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does each layer have a square opening on the front?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "다운로드 (1).jfif",
+      "true_count": 15,
+      "false_count": 5,
+      "true_ratio": 0.75,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the surface smooth?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the sculpture sitting down?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "다운로드 (2).jfif",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does the color look like rusty metal?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the number of layers exactly 5?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is there a prominent human-shaped statue in the picture?",
+          "expected": "no",
+          "got": "yes"
+        }
+      ],
+      "total_questions": 20
+    },
+    {
+      "image": "다운로드.jfif",
+      "true_count": 16,
+      "false_count": 4,
+      "true_ratio": 0.8,
+      "is_success": true,
+      "false_questions": [
+        {
+          "question": "Is the height much longer than the width?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is this object made of wood?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Does the sculpture only use dark colors?",
+          "expected": "yes",
+          "got": "no"
+        },
+        {
+          "question": "Is the bottom part the widest?",
+          "expected": "yes",
+          "got": "no"
+        }
+      ],
+      "total_questions": 20
+    }
+  ]
+}

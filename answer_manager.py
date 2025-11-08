@@ -84,14 +84,26 @@ def get_today_answers():
     # ✅ data 폴더 없으면 자동 생성
     os.makedirs(DATA_DIR, exist_ok=True)
     
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            state = json.load(f)
-            if state.get("date") == today:
-                # 오늘 날짜면 기존 값 반환
-                return state.get("answer"), state.get("hint"), state.get("hint2")
-    except FileNotFoundError:
-        pass
+    # 파일이 존재하고 비어있지 않은 경우에만 읽기 시도
+    if os.path.exists(STATE_FILE) and os.path.getsize(STATE_FILE) > 0:
+        try:
+            with open(STATE_FILE, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+                if content:  # 내용이 있는 경우에만 파싱 시도
+                    state = json.loads(content)
+                    if state.get("date") == today:
+                        # 오늘 날짜면 기존 값 반환
+                        answer = state.get("answer")
+                        hint = state.get("hint")
+                        hint2 = state.get("hint2")
+                        if answer and hint and hint2:
+                            return answer, hint, hint2
+        except (json.JSONDecodeError, ValueError, KeyError) as e:
+            # JSON 파싱 오류나 잘못된 형식일 경우 새로 생성
+            print(f"⚠️ 상태 파일 형식 오류: {e}. 새로 생성합니다.")
+        except Exception as e:
+            # 기타 오류
+            print(f"⚠️ 상태 파일 읽기 오류: {e}. 새로 생성합니다.")
     
     # 새로운 정답 생성
     # missions1에서 answer와 hint1 선택

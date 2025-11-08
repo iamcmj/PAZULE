@@ -35,30 +35,42 @@ def ensure_today_answer():
     
     os.makedirs(DATA_DIR, exist_ok=True)
     
-    today = str(date.today())
+    # ✅ 파일 없거나 비어 있으면 새로 생성
+    if not os.path.exists(STATE_FILE) or os.path.getsize(STATE_FILE) == 0:
+        print("📝 상태 파일이 없거나 비어있어 새로 생성합니다.")
+        return get_today_answers()
     
+    # ✅ 파일 내용 읽기 시도
     try:
-        # ✅ 파일 없거나 비어 있으면 새로 생성
-        if not os.path.exists(STATE_FILE) or os.path.getsize(STATE_FILE) == 0:
+        with open(STATE_FILE, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+            if not content:
+                # 파일이 비어있으면 새로 생성
+                print("📝 상태 파일이 비어있어 새로 생성합니다.")
+                return get_today_answers()
+            
+            state = json.loads(content)
+            today = str(date.today())
+            
+            # ✅ 날짜가 오늘이면 그대로 유지
+            if state.get("date") == today:
+                answer = state.get("answer")
+                hint = state.get("hint")
+                hint2 = state.get("hint2")
+                if answer and hint and hint2:
+                    return answer, hint, hint2
+            
+            # ✅ 날짜가 다르면 새로 생성
+            print("📅 날짜가 바뀌어 새 정답 생성")
             return get_today_answers()
         
-        # ✅ 파일 내용 읽기
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            state = json.load(f)
-        
-        # ✅ 날짜가 오늘이면 그대로 유지
-        if state.get("date") == today:
-            answer = state.get("answer")
-            hint = state.get("hint")
-            hint2 = state.get("hint2")
-            return answer, hint, hint2
-        
-        # ✅ 날짜가 다르면 새로 생성
-        print("📅 날짜가 바뀌어 새 정답 생성")
+    except json.JSONDecodeError as e:
+        # JSON 파싱 오류
+        print(f"⚠️ 상태 파일 JSON 형식 오류: {e}. 새로 생성합니다.")
         return get_today_answers()
-        
     except Exception as e:
-        print("⚠️ 상태 파일 로드 실패:", e)
+        # 기타 오류
+        print(f"⚠️ 상태 파일 로드 실패: {e}. 새로 생성합니다.")
         return get_today_answers()
 
 

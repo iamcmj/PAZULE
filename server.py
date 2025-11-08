@@ -13,7 +13,7 @@ if PROJECT_ROOT not in sys.path:
 
 # ✅ 모듈 임포트
 from answer_manager import get_today_answer
-from mission_manager import run_mission
+# from mission_manager import run_mission
 from metadata.validator import validate_metadata
 
 app = Flask(__name__)
@@ -26,10 +26,13 @@ STATE_FILE = os.path.join(DATA_DIR, "current_answer.json")
 # ✅ 전역 변수로 오늘의 정답과 힌트 저장
 today_answer = None
 today_hint = None
+today_hint2 = None
 
 
 def ensure_today_answer():
     """current_answer.json이 없거나 비어있거나 날짜가 다르면 새로 생성"""
+    from answer_manager import get_today_answers
+    
     os.makedirs(DATA_DIR, exist_ok=True)
     
     today = str(date.today())
@@ -37,7 +40,7 @@ def ensure_today_answer():
     try:
         # ✅ 파일 없거나 비어 있으면 새로 생성
         if not os.path.exists(STATE_FILE) or os.path.getsize(STATE_FILE) == 0:
-            return get_today_answer()
+            return get_today_answers()
         
         # ✅ 파일 내용 읽기
         with open(STATE_FILE, "r", encoding="utf-8") as f:
@@ -45,25 +48,31 @@ def ensure_today_answer():
         
         # ✅ 날짜가 오늘이면 그대로 유지
         if state.get("date") == today:
-            return state["answer"], state["hint"]
+            answer = state.get("answer")
+            hint = state.get("hint")
+            hint2 = state.get("hint2")
+            return answer, hint, hint2
         
         # ✅ 날짜가 다르면 새로 생성
         print("📅 날짜가 바뀌어 새 정답 생성")
-        return get_today_answer()
+        return get_today_answers()
         
     except Exception as e:
         print("⚠️ 상태 파일 로드 실패:", e)
-        return get_today_answer()
+        return get_today_answers()
 
 
 # ✅ 서버 시작 시 자동으로 오늘의 정답 보장
-today_answer, today_hint = ensure_today_answer()
+today_answer, today_hint, today_hint2 = ensure_today_answer()
 
 
 @app.route("/get-today-hint", methods=["GET"])
 def get_today_hint():
-    """HTML에서 호출하는 API"""
-    global today_answer, today_hint
+    """HTML에서 호출하는 API - mission_type 파라미터로 힌트 선택"""
+    global today_answer, today_hint, today_hint2
+    
+    # mission_type 파라미터 받기 (기본값: "location" -> missions1)
+    mission_type = request.args.get("mission_type", "location")
     
     # 혹시 서버가 오래 켜져 있다면 날짜 갱신 체크
     today = str(date.today())
@@ -73,65 +82,75 @@ def get_today_hint():
             state = json.load(f)
         if state.get("date") != today:
             print("📅 날짜가 바뀌어 재갱신합니다.")
-            today_answer, today_hint = get_today_answer()
+            today_answer, today_hint, today_hint2 = ensure_today_answer()
+        else:
+            today_answer = state.get("answer")
+            today_hint = state.get("hint")
+            today_hint2 = state.get("hint2")
     except FileNotFoundError:
         print("⚠️ current_answer.json 없음 → 새로 생성")
-        today_answer, today_hint = get_today_answer()
+        today_answer, today_hint, today_hint2 = ensure_today_answer()
     
-    return jsonify({"answer": today_answer, "hint": today_hint})
+    # mission_type에 따라 다른 힌트 반환
+    if mission_type == "photo":
+        hint = today_hint2 if today_hint2 else today_hint
+    else:
+        hint = today_hint if today_hint else today_hint2
+    
+    return jsonify({"answer": today_answer, "hint": hint})
 
 
-@app.route("/api/mission", methods=["POST"])
-def api_mission():
-    """미션 실행 API"""
-    global today_answer
+# @app.route("/api/mission", methods=["POST"])
+# def api_mission():
+#     """미션 실행 API"""
+#     global today_answer
     
-    if "image" not in request.files:
-        return jsonify({"error": "이미지 파일이 필요합니다."}), 400
+#     if "image" not in request.files:
+#         return jsonify({"error": "이미지 파일이 필요합니다."}), 400
     
-    file = request.files["image"]
-    if file.filename == "":
-        return jsonify({"error": "이미지 파일이 선택되지 않았습니다."}), 400
+#     file = request.files["image"]
+#     if file.filename == "":
+#         return jsonify({"error": "이미지 파일이 선택되지 않았습니다."}), 400
     
-    mission_type = request.form.get("mission_type", "photo")
+#     mission_type = request.form.get("mission_type", "photo")
     
-    # ✅ 임시 파일로 저장
-    import tempfile
-    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp_file:
-        file.save(tmp_file.name)
-        temp_path = tmp_file.name
+#     # ✅ 임시 파일로 저장
+#     import tempfile
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp_file:
+#         file.save(tmp_file.name)
+#         temp_path = tmp_file.name
     
-    try:
-        # ✅ 메타데이터 검증
-        if not validate_metadata(temp_path):
-            return jsonify({"error": "메타데이터 검증 실패"}), 400
+#     try:
+#         # ✅ 메타데이터 검증
+#         if not validate_metadata(temp_path):
+#             return jsonify({"error": "메타데이터 검증 실패"}), 400
         
-        # ✅ 미션 실행
-        result = run_mission(temp_path, mission_type, today_answer)
+#         # ✅ 미션 실행
+#         result = run_mission(temp_path, mission_type, today_answer)
         
-        # ✅ 결과 포맷 변환 (프론트엔드 형식에 맞춤)
-        if result.get("mission1") and result.get("mission2"):
-            return jsonify({
-                "success": True,
-                "coupon": result.get("coupon"),
-                "mission1": result.get("mission1"),
-                "mission2": result.get("mission2")
-            })
-        else:
-            return jsonify({
-                "success": False,
-                "hint": result.get("hint"),
-                "message": result.get("message"),
-                "mission1": result.get("mission1"),
-                "mission2": result.get("mission2")
-            })
-    except Exception as e:
-        print(f"미션 실행 오류: {e}")
-        return jsonify({"error": str(e)}), 500
-    finally:
-        # ✅ 임시 파일 삭제
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+#         # ✅ 결과 포맷 변환 (프론트엔드 형식에 맞춤)
+#         if result.get("mission1") and result.get("mission2"):
+#             return jsonify({
+#                 "success": True,
+#                 "coupon": result.get("coupon"),
+#                 "mission1": result.get("mission1"),
+#                 "mission2": result.get("mission2")
+#             })
+#         else:
+#             return jsonify({
+#                 "success": False,
+#                 "hint": result.get("hint"),
+#                 "message": result.get("message"),
+#                 "mission1": result.get("mission1"),
+#                 "mission2": result.get("mission2")
+#             })
+#     except Exception as e:
+#         print(f"미션 실행 오류: {e}")
+#         return jsonify({"error": str(e)}), 500
+#     finally:
+#         # ✅ 임시 파일 삭제
+#         if os.path.exists(temp_path):
+#             os.remove(temp_path)
 
 
 if __name__ == "__main__":

@@ -8,11 +8,11 @@
     {"answer": "활판인쇄박물관 활돌이", "hint": "분홍 소세지"}
   ],
   "missions2": [
-    {"answer": "피노키오", "hint": "동심"},
-    {"answer": "지혜의 숲 조각상", "hint": "탐구심"},
-    {"answer": "네모탑", "hint": "마트료시카"},
-    {"answer": "지혜의 숲 고양이", "hint": "내가 웃고 있나요?"},
-    {"answer": "활판 공방 인쇄기", "hint": "기록의 무게"},
-    {"answer": "활판인쇄박물관 활돌이", "hint": "분홍 소세지"}
+    {"answer": "1", "hint": "1"},
+    {"answer": "2", "hint": "2"},
+    {"answer": "3", "hint": "마트료시카"},
+    {"answer": "4", "hint": "3"},
+    {"answer": "5", "hint": "4"},
+    {"answer": "6", "hint": "5"}
   ]
 }

@@ -29,12 +29,15 @@ function App() {
     },
   ];
 
-  // ✅ 서버에서 오늘의 힌트 가져오기
+  // ✅ 서버에서 오늘의 힌트 가져오기 (mission_type에 따라)
   useEffect(() => {
     const fetchTodayHint = async () => {
       try {
         setHintLoading(true);
-        const response = await fetch(`${API_ENDPOINT}/get-today-hint`);
+        // mission_type에 따라 다른 힌트 가져오기
+        // "photo" -> missions2, "location" -> missions1
+        const missionParam = missionType === "photo" ? "photo" : "location";
+        const response = await fetch(`${API_ENDPOINT}/get-today-hint?mission_type=${missionParam}`);
         if (response.ok) {
           const data = await response.json();
           setTodayHint(data.hint || "");
@@ -51,7 +54,7 @@ function App() {
     };
 
     fetchTodayHint();
-  }, []);
+  }, [missionType]); // missionType이 변경될 때마다 힌트 다시 가져오기
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

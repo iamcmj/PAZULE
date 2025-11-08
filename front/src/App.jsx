@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
@@ -9,32 +9,49 @@ function App() {
   const [status, setStatus] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [todayHint, setTodayHint] = useState("");
+  const [hintLoading, setHintLoading] = useState(true);
 
-  const API_ENDPOINT = "http://localhost:8000";
+  const API_ENDPOINT = "http://localhost:8080";
 
   const missionTypes = [
     { 
       value: "photo", 
       label: "사진 촬영", 
       description: "감정이 담긴 사진을 찍어 업로드하세요",
-      icon: "📷",
-      keyword: "감정",
-      hint: "행복한 순간을 포착해보세요"
+      icon: "📷"
     },
     { 
       value: "location", 
       label: "장소 찾기", 
       description: "구조물이 있는 장소를 찾아가세요",
-      icon: "📍",
-      keyword: "구조물",
-      hint: "특별한 건축물이나 조형물을 찾아보세요"
+      icon: "📍"
     },
   ];
 
-  // 현재 선택된 미션 타입에 맞는 키워드와 힌트 가져오기
-  const currentMission = missionTypes.find(type => type.value === missionType) || missionTypes[0];
-  const todayKeyword = currentMission.keyword;
-  const hint = currentMission.hint;
+  // ✅ 서버에서 오늘의 힌트 가져오기
+  useEffect(() => {
+    const fetchTodayHint = async () => {
+      try {
+        setHintLoading(true);
+        const response = await fetch(`${API_ENDPOINT}/get-today-hint`);
+        if (response.ok) {
+          const data = await response.json();
+          setTodayHint(data.hint || "");
+        } else {
+          console.error("힌트 가져오기 실패");
+          setTodayHint("힌트를 불러올 수 없습니다.");
+        }
+      } catch (err) {
+        console.error("힌트 가져오기 오류:", err);
+        setTodayHint("힌트를 불러올 수 없습니다.");
+      } finally {
+        setHintLoading(false);
+      }
+    };
+
+    fetchTodayHint();
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -170,18 +187,15 @@ function App() {
               </div>
             </div>
 
-            {/* 오늘의 키워드 */}
+            {/* 오늘의 힌트 */}
             <div className="keyword-section">
-              <div className="keyword-header">
-                <StarIcon />
-                <span className="keyword-label">오늘의 키워드</span>
-              </div>
-              <div className="keyword-value">{todayKeyword}</div>
               <div className="hint-section">
                 <BulbIcon />
-                <span className="hint-label">힌트</span>
+                <span className="hint-label">오늘의 힌트</span>
               </div>
-              <p className="hint-text">{hint}</p>
+              <p className="hint-text">
+                {hintLoading ? "힌트를 불러오는 중..." : todayHint || "힌트를 불러올 수 없습니다."}
+              </p>
             </div>
 
             {/* 이미지 업로드 */}

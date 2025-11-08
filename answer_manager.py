@@ -13,7 +13,18 @@ STATE_FILE = os.path.join(DATA_DIR, "current_answer.json")
 def load_candidates():
     with open(ANSWER_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data["missions"]
+    # missions1과 missions2를 합쳐서 반환 (둘 다 같은 구조)
+    missions1 = data.get("missions1", [])
+    missions2 = data.get("missions2", [])
+    # 중복 제거 (answer 기준)
+    all_missions = missions1 + missions2
+    seen = set()
+    unique_missions = []
+    for mission in all_missions:
+        if mission["answer"] not in seen:
+            seen.add(mission["answer"])
+            unique_missions.append(mission)
+    return unique_missions
 
 
 def get_today_answer(admin_choice=None):

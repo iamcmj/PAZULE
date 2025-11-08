@@ -149,8 +149,66 @@ def check_with_blip(user_image_path, landmark_name):
     print(f"VQA Result: {yes_count}/{total_questions} 'yes' answers ({match_ratio:.2%}). Success: {is_success}")
 
     if is_success:
-        return True, []
+        return True, no_questions_list
     else:
         # [수정] 실패 시 'no'로 답변된 질문 리스트를 반환
         return False, no_questions_list
     
+
+if __name__ == "__main__":
+    
+    # --- 1. 테스트 설정 ---
+    
+    # [주의!] main.py에서 './metadata/test_image/test1.HEIC'를 사용했습니다.
+    # .HEIC 포맷은 'pip install pillow-heif'가 설치되어 있어야 PIL이 열 수 있습니다.
+    # 
+    # 만약 pillow-heif를 설치하지 않았다면,
+    # 이 파일 이름을 테스트하려는 .jpg 또는 .png 파일 이름으로 변경하세요.
+    test_image_name = "test3.jpg"
+    
+    # 'data/landmark_qa.json'에 정의된 테스트하려는 랜드마크 이름
+    test_landmark = "피노키오" 
+
+    # --- 2. 테스트 경로 설정 ---
+    # (경로는 이미 파일 상단에 정의된 PROJECT_ROOT를 기준으로 잡습니다)
+    test_image_path = os.path.join(PROJECT_ROOT, "metadata", "test_image", test_image_name)
+
+    print("="*30)
+    print("  BLIP Module Standalone Test  ")
+    print("="*30)
+
+    # --- 3. 실행 전 기본 확인 ---
+    if not processor or not model:
+        print("❌ 테스트 실패: BLIP 모델을 로드하지 못했습니다.")
+    elif not landmark_qa_data:
+        print(f"❌ 테스트 실패: {LANDMARK_QA_FILE} 파일을 로드하지 못했습니다.")
+    elif not landmark_qa_data.get(test_landmark):
+        print(f"❌ 테스트 실패: '{LANDMARK_QA_FILE}'에 '{test_landmark}' 키가 없습니다.")
+    elif not os.path.exists(test_image_path):
+         print(f"❌ 테스트 실패: 테스트 이미지 파일을 찾을 수 없습니다.")
+         print(f"   (경로: {test_image_path})")
+    else:
+        # --- 4. 메인 함수 실행 ---
+        print(f"▶️ Test Image: {test_image_path}")
+        print(f"▶️ Test Landmark: {test_landmark}")
+        print("Running check_with_blip...")
+        
+        try:
+            is_success, hint_payload = check_with_blip(test_image_path, test_landmark)
+            
+            print("\n--- 💡 Test Result ---")
+            print(f"Success: {is_success}")
+            print(hint_payload)
+            if not is_success:
+                print("Hint Payload ('no' or error questions):")
+                for q in hint_payload:
+                    print(f"  - {q}")
+            print("-----------------------")
+            
+        except Exception as e:
+            print(f"\n--- ❌ Test Failed with Runtime Exception ---")
+            print(f"Error: {e}")
+            if "cannot read HEIC file" in str(e):
+                print("\n[알림] .HEIC 파일을 열 수 없습니다.")
+                print("터미널에서 'pip install pillow-heif'를 실행하고 다시 시도해 주세요.")
+            print("---------------------------------------------")

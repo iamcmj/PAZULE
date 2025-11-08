@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # /models/blip_module.py
 
 import os
@@ -158,6 +157,3 @@ def check_with_blip(user_image_path, landmark_name):
 
 if __name__ == "__main__":
     main(user_image="./metadata/test_image/test1.HEIC", mission_type="mission1")
-=======
-# blip_module.py
->>>>>>> 9e40d90ebe096e8e036d4f14aff84f9a2c41a978

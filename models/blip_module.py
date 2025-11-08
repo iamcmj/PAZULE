@@ -154,6 +154,3 @@ def check_with_blip(user_image_path, landmark_name):
         # [수정] 실패 시 'no'로 답변된 질문 리스트를 반환
         return False, no_questions_list
     
-
-if __name__ == "__main__":
-    main(user_image="./metadata/test_image/test1.HEIC", mission_type="mission1")

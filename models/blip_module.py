@@ -44,13 +44,26 @@ def load_model():
 
 def load_landmark_qa():
     """랜드마크별 Q&A 데이터를 JSON 파일에서 로드합니다."""
+    # 먼저 landmark_qa_labeled.json 시도, 없으면 landmark_qa.json 사용
+    fallback_file = os.path.join(DATA_DIR, "landmark_qa.json")
+    
     try:
         with open(LANDMARK_QA_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
             print(f"Landmark Q&A data loaded from '{LANDMARK_QA_FILE}'.")
             return data
     except FileNotFoundError:
-        print(f"Error: Landmark Q&A file not found at '{LANDMARK_QA_FILE}'.")
+        # fallback 파일 시도
+        if os.path.exists(fallback_file):
+            try:
+                with open(fallback_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    print(f"Landmark Q&A data loaded from fallback file '{fallback_file}'.")
+                    return data
+            except Exception as e:
+                print(f"Error: Failed to load fallback file '{fallback_file}': {e}")
+        else:
+            print(f"Error: Landmark Q&A file not found at '{LANDMARK_QA_FILE}' or '{fallback_file}'.")
         return {}
     except json.JSONDecodeError:
         print(f"Error: Failed to decode JSON from '{LANDMARK_QA_FILE}'.")

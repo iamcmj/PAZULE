@@ -66,7 +66,7 @@ landmark_qa_data = load_landmark_qa()
 def check_with_blip(user_image_path, landmark_name):
     """
     BLIP VQA를 사용해 사용자 이미지가 해당 랜드마크가 맞는지 검증합니다.
-    JSON에 정의된 질문 리스트를 수행하고 'yes' 답변의 비율을 계산합니다.
+    JSON에 정의된 질문 리스트를 수행하고 바른 답변의 비율을 계산합니다.
 
     Args:
         user_image_path (str): 사용자가 업로드한 이미지 파일 경로
@@ -75,7 +75,7 @@ def check_with_blip(user_image_path, landmark_name):
     Returns:
         tuple: (is_success, hint_payload)
                is_success (bool): 미션 성공 여부 (True/False)
-               hint_payload (list): 'no'로 답변된 질문 목록 (LLM 힌트 생성용)
+               hint_payload (list): 틀리게 답변한 질문 목록 (LLM 힌트 생성용)
     """
     
     # --- 0. 모델 로드 확인 ---

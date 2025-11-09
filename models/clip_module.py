@@ -104,16 +104,18 @@ def check_with_clip(image, kw):
             top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         if top_mood[0] == kw and top_mood[1] == kw:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
+            state = "perfect"
             
         elif top_mood[0] == kw or sum(k == kw for k in top_mood) >= 3:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
+            state = "good"
             
         elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+            state = "not_bad"
                 
         else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
+            state = "bad"
+
+        result = make_answer(state, kw, top_mood, top_mood_specific)
 
     elif kw in kw_middle:
         top_keywords, scores = analyze_mood(image, label_pairs, 7)
@@ -125,17 +127,18 @@ def check_with_clip(image, kw):
             top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:5]) >= 2:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
+            state = "perfect"
             
         elif sum(k == kw for k in top_mood) >= 2:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
+            state = "good"
 
         elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+            state = "not_bad"
 
         else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
-        
+            state = "bad"
+
+        result = make_answer(state, kw, top_mood, top_mood_specific)
 
     elif kw in kw_weak:
         top_keywords, scores = analyze_mood(image, label_pairs, 9)
@@ -147,23 +150,38 @@ def check_with_clip(image, kw):
             top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:7]) >= 2:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
-        elif kw in top_mood[:7]:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
-        elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
-        else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
-    
-    print(result)
+            state = "perfect"
         
+        elif kw in top_mood[:7]:
+            state = "good"
+            
+        elif kw in top_mood:
+            state = "not_bad"
+            
+        else:
+            state = "bad"
+        
+        result = make_answer(state, kw, top_mood, top_mood_specific)
+    
+    is_success = state in ["perfect", "good"]
+    clip_result = {
+            "mission_keyword": kw,
+            "is_success": False,
+            "state": state,
+            "top_moods": top_mood[:5],
+            "feedback_message": result,
+            "suggested_keywords": list(feedback_guide[kw]["keywords"].values())
+        }
+
+    return is_success, clip_result
         
 if __name__ == "__main__":
     # 예시 실행
     # 돌려보고 싶으면 python models/clip_module.py
     
-    kw = "활기찬"
+    kw = "옛스러운"
     image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
     image = Image.open(image_path).convert("RGB")
 
-    check_with_clip(image, kw)
+    is_success, hint = check_with_clip(image, kw)
+    print("is_success:", is_success, "hint:", hint)

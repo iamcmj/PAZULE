@@ -1,8 +1,8 @@
 # mission_manager.py
-from github.models.blip_module_old import check_with_blip
+from models.blip_module import check_with_blip
 from models.clip_module import check_with_clip
 from models.llm_hint_generator import generate_hint
-from coupon_manager import give_coupon
+# from coupon_manager import give_coupon
 
 
 def run_mission(user_image, mission_type, answer):

@@ -17,13 +17,13 @@ function App() {
   const missionTypes = [
     { 
       value: "photo", 
-      label: "사진 촬영", 
+      label: "감성 촬영", 
       description: "감정이 담긴 사진을 찍어 업로드하세요",
       icon: "📷"
     },
     { 
       value: "location", 
-      label: "장소 찾기", 
+      label: "장소 촬영", 
       description: "구조물이 있는 장소를 찾아가세요",
       icon: "📍"
     },
@@ -56,13 +56,44 @@ function App() {
     fetchTodayHint();
   }, [missionType]); // missionType이 변경될 때마다 힌트 다시 가져오기
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      const reader = new FileReader();
-      reader.onload = () => setPreview(reader.result);
-      reader.readAsDataURL(file);
+      
+      // HEIC 파일 처리
+      const fileName = file.name.toLowerCase();
+      const isHeic = fileName.endsWith('.heic') || fileName.endsWith('.heif');
+      
+      if (isHeic) {
+        try {
+          // HEIC를 JPEG로 변환하여 미리보기
+          const heic2any = await import('heic2any');
+          const convertedBlob = await heic2any.default({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.8
+          });
+          
+          // 변환된 첫 번째 이미지 사용 (heic2any는 배열 반환)
+          const jpegBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+          const reader = new FileReader();
+          reader.onload = () => setPreview(reader.result);
+          reader.readAsDataURL(jpegBlob);
+        } catch (error) {
+          console.error('HEIC 변환 실패:', error);
+          // 변환 실패 시 기본 처리
+          const reader = new FileReader();
+          reader.onload = () => setPreview(reader.result);
+          reader.readAsDataURL(file);
+        }
+      } else {
+        // 일반 이미지 파일 (JPEG, PNG 등)
+        const reader = new FileReader();
+        reader.onload = () => setPreview(reader.result);
+        reader.readAsDataURL(file);
+      }
+      
       setResult(null);
     }
   };

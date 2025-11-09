@@ -10,7 +10,25 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 from utils.clip_loader import clip_model, clip_processor, device
-from config.keyword import keyword_mapping, kw_strong, kw_middle, kw_weak, rules, feedback_guide
+
+KEYWORD_JSON_PATH = os.path.join(PROJECT_ROOT, "data", "clip_keyword.json")
+
+try:
+    with open(KEYWORD_JSON_PATH, "r", encoding="utf-8") as f:
+        keyword_data = json.load(f)
+
+    keyword_mapping = keyword_data["keyword_mapping"]
+    kw_strong = keyword_data["kw_strong"]
+    kw_middle = keyword_data["kw_middle"]
+    kw_weak = keyword_data["kw_weak"]
+    rules = keyword_data["rules"]
+    feedback_guide = keyword_data["feedback_guide"]
+
+    print(f"✅ Loaded keyword config from {KEYWORD_JSON_PATH}")
+
+except Exception as e:
+    print(f"Error loading keyword config: {e}")
+    keyword_mapping, kw_strong, kw_middle, kw_weak, rules, feedback_guide = {}, [], [], [], [], {}
 
 def make_label_pairs(keyword_mapping):
     label_pairs = []
@@ -179,8 +197,8 @@ if __name__ == "__main__":
     # 예시 실행
     # 돌려보고 싶으면 python models/clip_module.py
     
-    kw = "옛스러운"
-    image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
+    kw = "활기찬"
+    image_path = os.path.join(PROJECT_ROOT, "data", "지혜의 숲", "7dcde12a-228d-4973-ac86-82928316e2b7.jpg")
     image = Image.open(image_path).convert("RGB")
 
     is_success, hint = check_with_clip(image, kw)

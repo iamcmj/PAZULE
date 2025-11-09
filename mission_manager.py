@@ -1,5 +1,5 @@
 # mission_manager.py
-from models.blip_module import check_with_blip
+from models.blip_module_old import check_with_blip
 from models.clip_module import check_with_clip
 from models.llm_hint_generator import generate_hint
 # from coupon_manager import give_coupon
@@ -27,7 +27,8 @@ def run_mission(user_image, mission_type, answer):
     # 결과에 따라 분기 처리
     if mission1_result and mission2_result:
         # 둘 다 성공 - 쿠폰 발급
-        coupon = give_coupon(answer)
+        # coupon = give_coupon(answer)
+        coupon = True
         return {
             "mission1": True,
             "mission2": True,

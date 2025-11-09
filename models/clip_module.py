@@ -1,18 +1,16 @@
 # clip_module.py
-import re, torch, os, sys
+import os
+import re
+import sys
+import json
+import torch
 from PIL import Image
 
-# clip_module 단독으로 돌리기 위해서 넣은 것, 나중에 빼야 됨
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 from utils.clip_loader import clip_model, clip_processor, device
-from config.keyword import (
-    keyword_mapping,
-    kw_strong,
-    kw_middle,
-    kw_weak,
-    feedback_guide,
-)
-
+from config.keyword import keyword_mapping, kw_strong, kw_middle, kw_weak, rules, feedback_guide
 
 def make_label_pairs(keyword_mapping):
     label_pairs = []
@@ -70,20 +68,34 @@ def find_mood(target):
         if target in values:
             return key
 
+def make_answer(state, kw, top_mood, top_mood_specific):
+    if state == "perfect":
+        result = f"완벽합니다!!🥳 {kw} 느낌을 아주 잘 담으셨어요!"
+        
+    elif state == "good":
+        result = f"훌륭합니다☺️ {kw} 느낌이 잘 담겨 있습니다!"
+        
+    elif state == "not_bad":
+        result = f"조금만 더 {kw} 느낌을 담아 보세요🙂 현재는 {top_mood[0]} 느낌이 더 강합니다!\n"
+        result += f"현재 이 사진으로부터 강하게 인식한 키워드 2개는 다음과 같습니다!\n"
+        for i, m in enumerate(top_mood_specific):
+            result += f"{i+1}. {m}({top_mood[i]})\n"
+            if i == 1:
+                break
 
-def check_with_clip(image_path, kw):
-    """
-    CLIP을 사용하여 이미지의 감정/분위기를 분석하고 목표 키워드와 일치하는지 확인합니다.
+    elif state == "bad":
+        result = f"아쉽습니다...🥲 {kw} 감성이 잘 보이지 않습니다.\n"
+        result += f"현재 이 사진으로부터 인식한 키워드는 다음과 같습니다.\n"
+        for i, m in enumerate(top_mood_specific):
+            result += f"{i+1}. {m}({top_mood[i]})\n"
+        result += f"\n💡 {feedback_guide[kw]['desc']}\n\n"
+        result += "📷 이러한 키워드를 참고해보세요:\n"
+        for eng, kor in feedback_guide[kw]["keywords"].items():
+            result += f" - {kor}\n"
+    
+    return result
 
-    Args:
-        image_path (str): 이미지 파일 경로 또는 PIL Image 객체
-        kw (str): 목표 감정/분위기 키워드 (예: "고요함", "즐거움", "활기찬")
-
-    Returns:
-        tuple: (is_success, clip_info)
-               is_success (bool): 미션 성공 여부 (True/False)
-               clip_info (list): 감지된 감정 키워드 리스트 (힌트 생성용)
-    """
+def check_with_clip(image, kw):
     print(f"오늘의 미션: {kw} 분위기, 감성을 지니고 있는 곳을 직접 찍어보세요!")
 
     # 이미지 로드 (파일 경로인 경우)
@@ -95,139 +107,81 @@ def check_with_clip(image_path, kw):
     label_pairs = make_label_pairs(keyword_mapping)
 
     if kw in kw_strong:
-        guide = feedback_guide
         top_keywords, scores = analyze_mood(image, label_pairs, 5)
-
         top_mood = []
         top_mood_specific = []
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
-            top_mood_specific.append(guide[find_mood(key)]["keywords"][key])
+            top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         # 성공 여부 판단
         is_success = False
         if top_mood[0] == kw and top_mood[1] == kw:
-            result = f"완벽합니다!!🥳 {kw} 느낌을 아주 잘 담으셨어요!"
-            is_success = True
+            result = make_answer("perfect", kw, top_mood, top_mood_specific)
+            
         elif top_mood[0] == kw or sum(k == kw for k in top_mood) >= 3:
-            result = f"훌륭합니다☺️ {kw} 느낌이 잘 담겨 있습니다!"
-            is_success = True
+            result = make_answer("good", kw, top_mood, top_mood_specific)
+            
         elif kw in top_mood:
-            result = f"조금만 더 {kw} 느낌을 담아 보세요🙂 현재는 {top_mood[0]} 느낌이 더 강합니다!\n"
-            result += (
-                f"현재 이 사진으로부터 강하게 인식한 키워드 2개는 다음과 같습니다!\n"
-            )
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-                if i == 1:
-                    break
+            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+                
         else:
-            result = f"아쉽습니다...🥲 {kw} 감성이 잘 보이지 않습니다 ㅜㅜ\n"
-            result += f"현재 이 사진으로부터 인식한 키워드는 다음과 같습니다!\n"
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-            result += f"\n💡 {guide[kw]['desc']}\n\n"
-            result += "📷 이러한 키워드를 참고해보세요:\n"
-            for eng, kor in guide[kw]["keywords"].items():
-                result += f" - {kor}\n"
-
-        print(result)
-        # 감정 정보 반환 (힌트 생성용)
-        clip_info = top_mood[:3] if not is_success else []
-        return is_success, clip_info
+            result = make_answer("bad", kw, top_mood, top_mood_specific)
 
     elif kw in kw_middle:
-        guide = feedback_guide
         top_keywords, scores = analyze_mood(image, label_pairs, 7)
-
         top_mood = []
         top_mood_specific = []
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
-            top_mood_specific.append(guide[find_mood(key)]["keywords"][key])
+            top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         # 성공 여부 판단
         is_success = False
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:5]) >= 2:
-            result = f"완벽합니다!!🥳 {kw} 느낌을 아주 잘 담으셨어요!"
-            is_success = True
+            result = make_answer("perfect", kw, top_mood, top_mood_specific)
+            
         elif sum(k == kw for k in top_mood) >= 2:
-            result = f"훌륭합니다☺️ {kw} 느낌이 잘 담겨 있습니다!"
-            is_success = True
+            result = make_answer("good", kw, top_mood, top_mood_specific)
+
         elif kw in top_mood:
-            result = f"조금만 더 {kw} 느낌을 담아 보세요🙂 현재는 {top_mood[0]} 느낌이 더 강합니다!\n"
-            result += (
-                f"현재 이 사진으로부터 강하게 인식한 키워드 2개는 다음과 같습니다!\n"
-            )
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-                if i == 1:
-                    break
+            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+
         else:
-            result = f"아쉽습니다...🥲 {kw} 감성이 잘 보이지 않습니다 ㅜㅜ\n"
-            result += f"현재 이 사진으로부터 인식한 키워드는 다음과 같습니다!\n"
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-            result += f"\n💡 {guide[kw]['desc']}\n\n"
-            result += "📷 이러한 키워드를 참고해보세요:\n"
-            for eng, kor in guide[kw]["keywords"].items():
-                result += f" - {kor}\n"
+            result = make_answer("bad", kw, top_mood, top_mood_specific)
+        
 
-        print(result)
-        # 감정 정보 반환 (힌트 생성용)
-        clip_info = top_mood[:3] if not is_success else []
-        return is_success, clip_info
-
-    else:
-        guide = feedback_guide
+    elif kw in kw_weak:
         top_keywords, scores = analyze_mood(image, label_pairs, 9)
-
         top_mood = []
         top_mood_specific = []
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
-            top_mood_specific.append(guide[find_mood(key)]["keywords"][key])
+            top_mood_specific.append(feedback_guide[find_mood(key)]["keywords"][key])
 
         # 성공 여부 판단
         is_success = False
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:7]) >= 2:
-            result = f"완벽합니다!!🥳 {kw} 느낌을 아주 잘 담으셨어요!"
-            is_success = True
+            result = make_answer("perfect", kw, top_mood, top_mood_specific)
         elif kw in top_mood[:7]:
-            result = f"훌륭합니다☺️ {kw} 느낌이 잘 담겨 있습니다!"
-            is_success = True
+            result = make_answer("good", kw, top_mood, top_mood_specific)
         elif kw in top_mood:
-            result = f"조금만 더 {kw} 느낌을 담아 보세요🙂 현재는 {top_mood[0]} 느낌이 더 강합니다!\n"
-            result += (
-                f"현재 이 사진으로부터 강하게 인식한 키워드 2개는 다음과 같습니다!\n"
-            )
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-                if i == 1:
-                    break
+            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
         else:
-            result = f"아쉽습니다...🥲 {kw} 감성이 잘 보이지 않습니다 ㅜㅜ\n"
-            result += f"현재 이 사진으로부터 인식한 키워드는 다음과 같습니다!\n"
-            for i, m in enumerate(top_mood_specific):
-                result += f"{i+1}. {m}({top_mood[i]})\n"
-            result += f"\n💡 {guide[kw]['desc']}\n\n"
-            result += "📷 이러한 키워드를 참고해보세요:\n"
-            for eng, kor in guide[kw]["keywords"].items():
-                result += f" - {kor}\n"
-        print(result)
-        # 감정 정보 반환 (힌트 생성용)
-        clip_info = top_mood[:3] if not is_success else []
-        return is_success, clip_info
-
-
+            result = make_answer("bad", kw, top_mood, top_mood_specific)
+    
+    print(result)
+        
+        
 if __name__ == "__main__":
     # 예시 실행
-    # 돌려보고 싶으면 python model/clip_module.py
-    kw = "활기찬"
-    image_path = "../data/지혜의숲 조각상/IMG_9802.jpg"
+    # 돌려보고 싶으면 python models/clip_module.py
+    
+    kw = "웅장한"
+    image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
     image = Image.open(image_path).convert("RGB")
 
     check_with_clip(image, kw)

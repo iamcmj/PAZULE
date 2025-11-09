@@ -1,6 +1,10 @@
 # ========================================
-# main.py
+# main.py - 로컬 테스트용 (CLI)
 # ========================================
+"""
+로컬 환경에서 미션을 테스트하기 위한 스크립트입니다.
+서버를 거치지 않고 직접 미션을 실행할 수 있습니다.
+"""
 import os
 import sys
 
@@ -11,71 +15,84 @@ if PROJECT_ROOT not in sys.path:
 
 # ✅ 모듈 임포트
 from answer_manager import get_today_answers
-from mission_manager import run_mission
+from mission_manager import run_mission1, run_mission2
 from metadata.validator import validate_metadata
 
 
-def execute_mission(user_image_path, answer1, answer2):
+def test_mission1(user_image_path, admin_choice1=None):
     """
-    미션을 실행하는 메인 함수
-    server.py에서 호출하여 사용
+    Mission1 (장소 찾기) 로컬 테스트
 
     Args:
-        user_image_path (str): 사용자가 업로드한 이미지 파일 경로
-        answer1 (str): Mission1(BLIP)용 정답 랜드마크 이름
-        answer2 (str): Mission2(CLIP)용 정답 감정/분위기 키워드
-
-    Returns:
-        dict: 미션 결과 정보
-            - 성공: {"success": True, "mission1": True, "mission2": True, "coupon": str}
-            - 실패: {"success": False, "mission1": bool, "mission2": bool, "hint": str, "message": str}
-        None: 메타데이터 검증 실패 시
+        user_image_path (str): 테스트할 이미지 파일 경로
+        admin_choice1 (str, optional): 관리자가 지정한 mission1 정답
     """
-    # 1️⃣ 메타데이터 유효성 검사
+    print("=" * 60)
+    print("Mission1 (장소 찾기) 테스트")
+    print("=" * 60)
+
+    # 오늘의 정답 가져오기
+    answer1, answer2, hint1, hint2 = get_today_answers(admin_choice1, None)
+    print(f"정답: {answer1}")
+    print(f"힌트: {hint1}\n")
+
+    # 메타데이터 검증
     if not validate_metadata(user_image_path):
-        return None
-
-    # 2️⃣ 미션 실행 (answer1과 answer2를 각각 전달)
-    result = run_mission(user_image_path, "both", answer1, answer2)
-
-    # 3️⃣ 결과 포맷 변환 (프론트엔드 형식에 맞춤)
-    if result.get("mission1") and result.get("mission2"):
-        return {
-            "success": True,
-            "mission1": result.get("mission1"),
-            "mission2": result.get("mission2"),
-            "coupon": result.get("coupon"),
-        }
-    else:
-        return {
-            "success": False,
-            "mission1": result.get("mission1"),
-            "mission2": result.get("mission2"),
-            "hint": result.get("hint"),
-            "message": result.get("message"),
-        }
-
-
-def main(user_image, mission_type, admin_choice1=None, admin_choice2=None):
-    """
-    CLI 테스트용 함수 (개발/디버깅용)
-    """
-    # 1️⃣ 오늘의 정답/힌트 결정 (mission1과 mission2 각각)
-    answer1, answer2, hint1, hint2 = get_today_answers(admin_choice1, admin_choice2)
-    print(f"Mission1 정답: {answer1}, 힌트: {hint1}")
-    print(f"Mission2 정답: {answer2}, 힌트: {hint2}")
-
-    # 2️⃣ 미션 실행
-    result = execute_mission(user_image, answer1, answer2)
-
-    # 3️⃣ 결과 출력
-    if result is None:
         print("❌ 메타데이터 검증 실패")
-    elif result.get("success"):
-        print(f"🎉 정답입니다! 쿠폰: {result.get('coupon')}")
+        return
+
+    # 미션 실행
+    result = run_mission1(user_image_path, answer1)
+
+    # 결과 출력
+    if result.get("success"):
+        print(f"🎉 Mission1 성공! 쿠폰: {result.get('coupon')}")
     else:
-        print(f"❌ 오답! 힌트: {result.get('hint')}")
+        print(f"❌ Mission1 실패!")
+        print(f"힌트: {result.get('hint')}")
+        print(f"메시지: {result.get('message')}")
+
+
+def test_mission2(user_image_path, admin_choice2=None):
+    """
+    Mission2 (사진 촬영) 로컬 테스트
+
+    Args:
+        user_image_path (str): 테스트할 이미지 파일 경로
+        admin_choice2 (str, optional): 관리자가 지정한 mission2 정답
+    """
+    print("=" * 60)
+    print("Mission2 (사진 촬영) 테스트")
+    print("=" * 60)
+
+    # 오늘의 정답 가져오기
+    answer1, answer2, hint1, hint2 = get_today_answers(None, admin_choice2)
+    print(f"정답: {answer2}")
+    print(f"힌트: {hint2}\n")
+
+    # 메타데이터 검증
+    if not validate_metadata(user_image_path):
+        print("❌ 메타데이터 검증 실패")
+        return
+
+    # 미션 실행
+    result = run_mission2(user_image_path, answer2)
+
+    # 결과 출력
+    if result.get("success"):
+        print(f"🎉 Mission2 성공! {result.get('message')}")
+    else:
+        print(f"❌ Mission2 실패!")
+        print(f"힌트: {result.get('hint')}")
+        print(f"메시지: {result.get('message')}")
 
 
 if __name__ == "__main__":
-    main(user_image="./metadata/test_image/test1.HEIC", mission_type="mission1")
+    # 테스트 이미지 경로
+    test_image = "./metadata/test_image/test1.HEIC"
+
+    # Mission1 테스트
+    # test_mission1(test_image, admin_choice1="피노키오")
+
+    # Mission2 테스트
+    # test_mission2(test_image, admin_choice2="고요함")

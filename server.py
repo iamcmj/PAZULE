@@ -12,7 +12,9 @@ if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
 # ✅ 모듈 임포트
-from main import execute_mission
+from answer_manager import get_today_answers
+from mission_manager import run_mission1, run_mission2
+from metadata.validator import validate_metadata
 
 app = Flask(__name__)
 CORS(app)  # 프론트엔드와 통신을 위해 CORS 활성화
@@ -119,15 +121,19 @@ def get_today_hint():
 
 @app.route("/api/mission", methods=["POST"])
 def api_mission():
-    """미션 실행 API - main.py의 execute_mission 함수 호출"""
+    """미션 실행 API - mission_type에 따라 적절한 미션 실행"""
     global today_answer1, today_answer2
 
+    # ✅ 이미지 파일 확인
     if "image" not in request.files:
         return jsonify({"error": "이미지 파일이 필요합니다."}), 400
 
     file = request.files["image"]
     if file.filename == "":
         return jsonify({"error": "이미지 파일이 선택되지 않았습니다."}), 400
+
+    # ✅ mission_type 확인 (기본값: "location" -> mission1)
+    mission_type = request.form.get("mission_type", "location")
 
     # ✅ 임시 파일로 저장
     import tempfile
@@ -139,16 +145,22 @@ def api_mission():
         temp_path = tmp_file.name
 
     try:
-        # ✅ main.py의 execute_mission 함수 호출
-        result = execute_mission(temp_path, today_answer1, today_answer2)
-
-        if result is None:
+        # ✅ 메타데이터 유효성 검사
+        if not validate_metadata(temp_path):
             return (
                 jsonify(
                     {"error": "오늘 촬영한 사진이 아니거나 출판단지 내부가 아닙니다."}
                 ),
                 400,
             )
+
+        # ✅ mission_type에 따라 적절한 미션 실행
+        if mission_type == "photo":
+            # Mission2 (사진 촬영) - CLIP 감정 분석
+            result = run_mission2(temp_path, today_answer2)
+        else:
+            # Mission1 (장소 찾기) - BLIP 장소 인식
+            result = run_mission1(temp_path, today_answer1)
 
         return jsonify(result)
     except Exception as e:

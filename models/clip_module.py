@@ -162,7 +162,7 @@ if __name__ == "__main__":
     # 예시 실행
     # 돌려보고 싶으면 python models/clip_module.py
     
-    kw = "웅장한"
+    kw = "활기찬"
     image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
     image = Image.open(image_path).convert("RGB")
 

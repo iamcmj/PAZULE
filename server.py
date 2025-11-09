@@ -135,11 +135,20 @@ def api_mission():
     # ✅ mission_type 확인 (기본값: "location" -> mission1)
     mission_type = request.form.get("mission_type", "location")
 
-    # ✅ 임시 파일로 저장
+    # ✅ 파일 확장자 확인 및 HEIC 지원
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    allowed_extensions = ['.jpg', '.jpeg', '.png', '.heic', '.heif']
+    
+    if file_ext not in allowed_extensions:
+        return jsonify({
+            "error": f"지원하지 않는 파일 형식입니다. 지원 형식: {', '.join(allowed_extensions)}"
+        }), 400
+
+    # ✅ 임시 파일로 저장 (HEIC 파일도 원본 확장자 유지)
     import tempfile
 
     with tempfile.NamedTemporaryFile(
-        delete=False, suffix=os.path.splitext(file.filename)[1]
+        delete=False, suffix=file_ext
     ) as tmp_file:
         file.save(tmp_file.name)
         temp_path = tmp_file.name

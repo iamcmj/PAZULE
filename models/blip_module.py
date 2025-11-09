@@ -5,6 +5,7 @@ import json
 import torch
 from PIL import Image
 from transformers import BlipProcessor, BlipForQuestionAnswering
+from tqdm import tqdm
 
 
 # --- 디바이스 설정 ---
@@ -117,7 +118,7 @@ def check_with_blip(user_image_path, landmark_name):
 
     print(f"Running VQA for landmark '{landmark_name}' ({total_questions} questions)...")
 
-    for item in question_list:
+    for item in tqdm(question_list, desc=f"Running BLIP VQA for {landmark_name}", unit="question"):
         question = item[0]
         expected_answer = item[1]
         

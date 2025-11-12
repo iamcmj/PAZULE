@@ -89,10 +89,10 @@ def test_mission2(user_image_path, admin_choice2=None):
 
 if __name__ == "__main__":
     # 테스트 이미지 경로
-    test_image = "./metadata/test_image/test1.HEIC"
+    test_image = "./data/활판 공방/13518647321211.jpg"
 
     # Mission1 테스트
     # test_mission1(test_image, admin_choice1="피노키오")
 
     # Mission2 테스트
-    test_mission2(test_image, admin_choice2="자연적인")
+    test_mission2(test_image, admin_choice2="차분한")

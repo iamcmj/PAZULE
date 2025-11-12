@@ -106,12 +106,32 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = []
+            moods_set = set()
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
+            moods = ', '.join(filtered_moods)
         else:
             detected_top_moods = top_mood
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = []
+            moods_set = set()
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
+            moods = ', '.join(filtered_moods)
 
     elif kw in kw_middle:
         top_keywords = analyze_mood(pil_image, label_pairs, 7)
@@ -127,11 +147,31 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
+            filtered_moods = []
+            moods_set = set()
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
             moods = ', '.join(filtered_moods)
         else:
             detected_top_moods = top_mood
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
+            filtered_moods = []
+            moods_set = set()
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
             moods = ', '.join(filtered_moods)
 
     elif kw in kw_weak:
@@ -148,19 +188,41 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = []
+            moods_set = set()
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
+            moods = ', '.join(filtered_moods)
         else:
             detected_top_moods = top_mood
-            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = []
+            moods_set = set()
+            # 활기찬, 차분한 대조가 됨
+            # 둘 중에 하나라도 먼저 나오면 그 다음부터는 그냥 추가를 안하는걸로 
+            for mood in detected_top_moods:
+                if mood != kw:
+                    if mood not in moods_set:
+                        filtered_moods.append(mood)
+                    moods_set.add(mood)
+                    if mood == "활기찬":
+                        moods_set.add("차분한")
+                    if mood == "차분한":
+                        moods_set.add("활기찬")
+            moods = ', '.join(filtered_moods)
     
     # 감정 정보 반환 (힌트 생성용)
     if not is_success:
         clip_info.append({
             "question": f"이 장소에서 {kw} 분위기가 느껴지나요?",
-            "model answer": f"아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
-            "expected answer": f"네, 이 장소는 {kw} 분위기가 느껴져요.",
+            "model_answer": f"아니요, 이 장소는 {moods} 분위기 순서대로 더 강하게 느껴져요.",
+            "expected_answer": f"네, 이 장소는 {kw} 분위기가 느껴져요.",
         })
     return is_success, clip_info
         

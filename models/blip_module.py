@@ -45,7 +45,7 @@ def load_model():
 def load_landmark_qa():
     """랜드마크별 Q&A 데이터를 JSON 파일에서 로드합니다."""
     # 먼저 landmark_qa_labeled.json 시도, 없으면 landmark_qa.json 사용
-    fallback_file = os.path.join(DATA_DIR, "landmark_qa_label.json")
+    fallback_file = os.path.join(DATA_DIR, "landmark_qa.json")
     
     try:
         with open(LANDMARK_QA_FILE, "r", encoding="utf-8") as f:

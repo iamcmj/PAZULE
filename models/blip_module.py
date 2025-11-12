@@ -28,6 +28,7 @@ SUCCESS_THRESHOLD = 0.75
 # 모델 및 데이터 전역 로드 (성능 최적화)
 # =====================================
 
+
 def load_model():
     """BLIP VQA 모델과 프로세서를 로드합니다."""
     print(f"Loading BLIP VQA model '{MODEL_NAME}'...")
@@ -40,19 +41,34 @@ def load_model():
         print(f"Error loading BLIP model: {e}")
         return None, None
 
+
 def load_landmark_qa():
     """랜드마크별 Q&A 데이터를 JSON 파일에서 로드합니다."""
+    # 먼저 landmark_qa_labeled.json 시도, 없으면 landmark_qa.json 사용
+    fallback_file = os.path.join(DATA_DIR, "landmark_qa.json")
+    
     try:
-        with open(LANDMARK_QA_FILE, 'r', encoding='utf-8') as f:
+        with open(LANDMARK_QA_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
             print(f"Landmark Q&A data loaded from '{LANDMARK_QA_FILE}'.")
             return data
     except FileNotFoundError:
-        print(f"Error: Landmark Q&A file not found at '{LANDMARK_QA_FILE}'.")
+        # fallback 파일 시도
+        if os.path.exists(fallback_file):
+            try:
+                with open(fallback_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    print(f"Landmark Q&A data loaded from fallback file '{fallback_file}'.")
+                    return data
+            except Exception as e:
+                print(f"Error: Failed to load fallback file '{fallback_file}': {e}")
+        else:
+            print(f"Error: Landmark Q&A file not found at '{LANDMARK_QA_FILE}' or '{fallback_file}'.")
         return {}
     except json.JSONDecodeError:
         print(f"Error: Failed to decode JSON from '{LANDMARK_QA_FILE}'.")
         return {}
+
 
 # --- 모델과 데이터 로드 ---
 processor, model = load_model()
@@ -62,6 +78,7 @@ landmark_qa_data = load_landmark_qa()
 # =====================================
 # 메인 함수
 # =====================================
+
 
 def check_with_blip(user_image_path, landmark_name):
     """
@@ -77,12 +94,12 @@ def check_with_blip(user_image_path, landmark_name):
                is_success (bool): 미션 성공 여부 (True/False)
                hint_payload (list): 틀리게 답변한 질문 목록 (LLM 힌트 생성용)
     """
-    
+
     # --- 0. 모델 로드 확인 ---
     if not processor or not model:
         print("Error: BLIP model is not loaded. Aborting mission.")
         return False, []
-        
+
     # --- 1. 랜드마크에 해당하는 질문 리스트 가져오기 ---
     question_list = landmark_qa_data.get(landmark_name)
 
@@ -97,7 +114,7 @@ def check_with_blip(user_image_path, landmark_name):
 
     # --- 2. 이미지 로드 ---
     try:
-        raw_image = Image.open(user_image_path).convert('RGB')
+        raw_image = Image.open(user_image_path).convert("RGB")
     except FileNotFoundError:
         print(f"Error: User image not found at '{user_image_path}'.")
         return False, []
@@ -110,12 +127,16 @@ def check_with_blip(user_image_path, landmark_name):
     incorrect_questions_list = []  # 오답 목록 저장용
 
     try:
-        pixel_values = processor(images=raw_image, return_tensors="pt").pixel_values.to(DEVICE)
+        pixel_values = processor(images=raw_image, return_tensors="pt").pixel_values.to(
+            DEVICE
+        )
     except Exception as e:
         print(f"Error processing image with BLIP: {e}")
         return False, []
 
-    print(f"Running VQA for landmark '{landmark_name}' ({total_questions} questions)...")
+    print(
+        f"Running VQA for landmark '{landmark_name}' ({total_questions} questions)..."
+    )
 
     for item in question_list:
         question = item[0]
@@ -123,12 +144,12 @@ def check_with_blip(user_image_path, landmark_name):
         
         try:
             inputs = processor(text=question, return_tensors="pt").to(DEVICE)
-            
+
             out = model.generate(
-                pixel_values=pixel_values, 
+                pixel_values=pixel_values,
                 input_ids=inputs.input_ids,
                 attention_mask=inputs.attention_mask,
-                max_new_tokens=10 
+                max_new_tokens=10,
             )
             
             model_answer = processor.decode(out[0], skip_special_tokens=True).strip().lower()
@@ -165,8 +186,14 @@ def check_with_blip(user_image_path, landmark_name):
         return False, incorrect_questions_list
     
 
+
+# =====================================
+# ⚠️ 주의: 아래 코드는 테스트용입니다
+# =====================================
+# 이 블록은 이 파일을 직접 실행할 때만 실행됩니다 (python blip_module.py)
+# 다른 모듈에서 import할 때는 실행되지 않으므로 서버 추론에 영향을 미치지 않습니다.
 if __name__ == "__main__":
-    
+
     # --- 1. 테스트 설정 ---
     test_image_name = "test4.jpg"
     test_landmark = "네모탑" 
@@ -184,19 +211,21 @@ if __name__ == "__main__":
     elif not landmark_qa_data:
         print(f"❌ 테스트 실패: {LANDMARK_QA_FILE} 파일을 로드하지 못했습니다.")
     elif not landmark_qa_data.get(test_landmark):
-        print(f"❌ 테스트 실패: '{LANDMARK_QA_FILE}'에 '{test_landmark}' 키가 없습니다.")
+        print(
+            f"❌ 테스트 실패: '{LANDMARK_QA_FILE}'에 '{test_landmark}' 키가 없습니다."
+        )
     elif not os.path.exists(test_image_path):
-         print(f"❌ 테스트 실패: 테스트 이미지 파일을 찾을 수 없습니다.")
-         print(f"   (경로: {test_image_path})")
+        print(f"❌ 테스트 실패: 테스트 이미지 파일을 찾을 수 없습니다.")
+        print(f"   (경로: {test_image_path})")
     else:
         # --- 4. 메인 함수 실행 ---
         print(f"▶️ Test Image: {test_image_path}")
         print(f"▶️ Test Landmark: {test_landmark}")
         print("Running check_with_blip...")
-        
+
         try:
             is_success, hint_payload = check_with_blip(test_image_path, test_landmark)
-            
+
             print("\n--- 💡 Test Result ---")
             print(f"Success: {is_success}")
             
@@ -209,11 +238,13 @@ if __name__ == "__main__":
                 print("Hint Payload is empty, mission successful!")
 
             print("-----------------------")
-            
+
         except Exception as e:
             print(f"\n--- ❌ Test Failed with Runtime Exception ---")
             print(f"Error: {e}")
             if "cannot read HEIC file" in str(e):
                 print("\n[알림] .HEIC 파일을 열 수 없습니다.")
-                print("터미널에서 'pip install pillow-heif'를 실행하고 다시 시도해 주세요.")
+                print(
+                    "터미널에서 'pip install pillow-heif'를 실행하고 다시 시도해 주세요."
+                )
             print("---------------------------------------------")

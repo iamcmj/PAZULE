@@ -1,0 +1,33 @@
+# ============================================
+# 파주 출판단지 보물찾기 게임 프로젝트
+# Python 패키지 의존성 목록
+# ============================================
+#
+# 설치 방법:
+#   pip install -r requirements.txt
+#
+# GPU 지원이 있는 경우 (CUDA):
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+#   pip install -r requirements.txt
+#
+# ============================================
+
+# 웹 프레임워크
+flask>=2.3.0
+flask-cors>=4.0.0
+
+# 딥러닝 프레임워크
+# 주의: CPU 버전은 기본적으로 설치되지만, GPU 사용 시 위의 CUDA 설치 명령을 먼저 실행하세요
+torch>=2.0.0
+transformers>=4.30.0
+
+# 이미지 처리
+Pillow>=10.0.0
+pillow-heif>=0.13.0  # HEIC 파일 지원
+
+# OpenAI API
+openai>=1.0.0
+
+# 환경 변수 관리
+python-dotenv>=1.0.0
+

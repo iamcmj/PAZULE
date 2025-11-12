@@ -87,7 +87,8 @@ def check_with_clip(image, kw):
 
     label_pairs = make_label_pairs(keyword_mapping)
     is_success = False
-    result = ""
+    moods = ""
+      
     top_mood = []
     top_mood_specific = []
     clip_info = []
@@ -105,9 +106,11 @@ def check_with_clip(image, kw):
         elif top_mood[0] == kw or sum(k == kw for k in top_mood) >= 3:
             is_success = True
         elif kw in top_mood:
-            is_success = False
+            detected_top_moods = top_mood[:3]
+            moods = ', '.join(detected_top_moods)
         else:
-            is_success = False
+            detected_top_moods = top_mood
+            moods = ', '.join(detected_top_moods)
 
     elif kw in kw_middle:
         top_keywords = analyze_mood(pil_image, label_pairs, 7)
@@ -122,9 +125,11 @@ def check_with_clip(image, kw):
         elif sum(k == kw for k in top_mood) >= 2:
             is_success = True
         elif kw in top_mood:
-            is_success = False
+            detected_top_moods = top_mood[:3]
+            moods = ', '.join(detected_top_moods)
         else:
-            is_success = False
+            detected_top_moods = top_mood
+            moods = ', '.join(detected_top_moods)
 
     elif kw in kw_weak:
         top_keywords = analyze_mood(pil_image, label_pairs, 9)
@@ -139,12 +144,19 @@ def check_with_clip(image, kw):
         elif kw in top_mood[:7]:
             is_success = True
         elif kw in top_mood:
-            is_success = False
+            detected_top_moods = top_mood[:3]
+            moods = ', '.join(detected_top_moods)
         else:
-            is_success = False
+            detected_top_moods = top_mood
+            moods = ', '.join(detected_top_moods)
     
     # 감정 정보 반환 (힌트 생성용)
-    clip_info = top_mood[:3] if not is_success else []
+    if not is_success:
+        clip_info.append({
+            f"질문: 이 장소에서 {kw} 분위기가 느껴지나요?",
+            f"model answer: 아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
+            f"expected answer: 네, 이 장소는 {kw} 분위기가 느껴져요."
+        })
     return is_success, clip_info
         
         
@@ -152,9 +164,10 @@ if __name__ == "__main__":
     # 예시 실행
     # 돌려보고 싶으면 python models/clip_module.py
     
-    kw = "웅장한"
+    kw = "자연적인"
     image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
     image = Image.open(image_path).convert("RGB")
 
     is_success, clip_info = check_with_clip(image, kw)
-    print(is_success, clip_info)
+    print(is_success)
+    print('\n', clip_info)

@@ -23,22 +23,14 @@ function App() {
   const [todayHint, setTodayHint] = useState("");
   const [hintLoading, setHintLoading] = useState(true);
   const [history, setHistory] = useState([]);
+  const [completedMissions, setCompletedMissions] = useState({
+    photo: false,
+    location: false
+  });
 
   const API_ENDPOINT = "http://localhost:8080";
 
   const introImages = [intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8];
-
-  // 로컬스토리지에서 히스토리 불러오기
-  useEffect(() => {
-    const savedHistory = localStorage.getItem("missionHistory");
-    if (savedHistory) {
-      try {
-        setHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error("히스토리 불러오기 실패:", e);
-      }
-    }
-  }, []);
 
   // 히스토리에 쿠폰 저장
   const saveToHistory = (resultData) => {
@@ -46,16 +38,27 @@ function App() {
       const historyItem = {
         id: Date.now(),
         date: new Date().toISOString(),
-        missionType: missionType,
+        missionType: resultData.missionType || missionType,
         coupon: resultData.coupon.code || resultData.coupon,
         couponDescription: resultData.coupon.description || "",
         success: true
       };
       setHistory((prevHistory) => {
-        const updatedHistory = [historyItem, ...prevHistory];
-        localStorage.setItem("missionHistory", JSON.stringify(updatedHistory));
-        return updatedHistory;
+        return [historyItem, ...prevHistory];
       });
+
+      const completedType = resultData.missionType || missionType;
+      if (completedType) {
+        setCompletedMissions((prev) => {
+          if (prev[completedType]) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [completedType]: true
+          };
+        });
+      }
     }
   };
 
@@ -165,6 +168,12 @@ function App() {
   };
 
   const handleSubmit = async () => {
+    if (completedMissions[missionType]) {
+      alert("이미 성공한 미션입니다. 다른 미션을 선택해주세요.");
+      setStep("select");
+      setActiveTab("home");
+      return;
+    }
     if (!image) {
       alert("이미지를 선택해주세요.");
       return;
@@ -219,12 +228,17 @@ function App() {
     setResult(null);
     setLoading(false);
     setStep("select"); // 처음 화면으로 돌아가기
+    setActiveTab("home");
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) fileInput.value = "";
   };
 
   // 미션 타입 선택 시 업로드 화면으로 이동
   const handleMissionTypeSelect = (type) => {
+    if (completedMissions[type]) {
+      alert("이미 성공한 미션입니다. 다른 미션을 선택해주세요.");
+      return;
+    }
     setMissionType(type);
     setStep("upload");
     // 미션 타입에 맞는 탭으로 이동
@@ -286,11 +300,11 @@ function App() {
     </svg>
   );
 
-  // 카메라 아이콘 SVG
-  const CameraIcon = () => (
+  // 나뭇잎 아이콘 SVG
+  const LeafIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M12 17C14.2091 17 16 15.2091 16 13C16 10.7909 14.2091 9 12 9C9.79086 9 8 10.7909 8 13C8 15.2091 9.79086 17 12 17Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 21C3 21 5 13 11 7C17 1 21 3 21 3C21 3 23 7 17 13C11 19 3 21 3 21Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 21C3 21 9 17 13 13C17 9 21 3 21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 
@@ -455,8 +469,8 @@ function App() {
               <>
                 {/* 환영 헤더 */}
                 <div className="welcome-header">
-                  <h2 className="welcome-title">안녕하세요! 👋</h2>
-                  <p className="welcome-subtitle">오늘도 파주의 아름다움을 발견해보세요</p>
+                  <h2 className="welcome-title">미션 완료 혜택</h2>
+                  <p className="welcome-subtitle">미션을 성공하면 파주의 특별한 장소에서 사용할 수 있는 쿠폰을 받을 수 있어요!</p>
                   <div className="completion-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -469,41 +483,35 @@ function App() {
                 <div className="mission-type-section">
                   <h3 className="section-heading">오늘의 미션</h3>
                   <div className="mission-type-cards">
-                    {missionTypes.map((type) => (
-                      <div
-                        key={type.value}
-                        className="mission-card-new"
-                        onClick={() => handleMissionTypeSelect(type.value)}
-                      >
-                        <div className="mission-card-icon-wrapper">
-                          {type.value === "photo" ? (
-                            <CameraIcon />
-                          ) : (
-                            <MapPinIcon />
-                          )}
+                    {missionTypes.map((type) => {
+                      const isCompleted = completedMissions[type.value];
+                      return (
+                        <div
+                          key={type.value}
+                          className={`mission-card-new ${isCompleted ? "completed" : ""}`}
+                          onClick={() => {
+                            if (!isCompleted) {
+                              handleMissionTypeSelect(type.value);
+                            }
+                          }}
+                        >
+                          <div className="mission-card-icon-wrapper">
+                            {type.value === "photo" ? (
+                              <LeafIcon />
+                            ) : (
+                              <MapPinIcon />
+                            )}
+                          </div>
+                          <div className="mission-card-content">
+                            <h4 className="mission-card-title">{type.label}</h4>
+                            <p className="mission-card-description">{type.description}</p>
+                            <button className="mission-card-start-btn" disabled={isCompleted}>
+                              {isCompleted ? "완료됨" : "시작하기 →"}
+                            </button>
+                          </div>
                         </div>
-                        <div className="mission-card-content">
-                          <h4 className="mission-card-title">{type.label}</h4>
-                          <p className="mission-card-description">{type.description}</p>
-                          <button className="mission-card-start-btn">
-                            시작하기 →
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 미션 완료 혜택 섹션 */}
-                <div className="benefit-card">
-                  <div className="benefit-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
-                    </svg>
-                  </div>
-                  <div className="benefit-content">
-                    <h4 className="benefit-title">미션 완료 혜택</h4>
-                    <p className="benefit-description">미션을 성공하면 파주의 특별한 장소에서 사용할 수 있는 쿠폰을 받을 수 있어요!</p>
+                      );
+                    })}
                   </div>
                 </div>
               </>
@@ -567,7 +575,7 @@ function App() {
                 <button
                   className="submit-btn"
                   onClick={handleSubmit}
-                  disabled={!image || !missionType || loading}
+                  disabled={!image || !missionType || loading || completedMissions[missionType]}
                 >
                   {loading ? "처리 중..." : "미션 제출하기"}
                 </button>
@@ -649,17 +657,25 @@ function App() {
           <button
             className={`nav-btn ${activeTab === "photo" ? "active" : ""}`}
             onClick={() => {
+              if (completedMissions.photo) {
+                alert("이미 성공한 미션입니다. 다른 미션을 선택해주세요.");
+                return;
+              }
               setMissionType("photo");
               setStep("upload");
               setActiveTab("photo");
             }}
           >
-            <CameraIcon />
+            <LeafIcon />
             <span>감성 촬영</span>
           </button>
           <button
             className={`nav-btn ${activeTab === "location" ? "active" : ""}`}
             onClick={() => {
+              if (completedMissions.location) {
+                alert("이미 성공한 미션입니다. 다른 미션을 선택해주세요.");
+                return;
+              }
               setMissionType("location");
               setStep("upload");
               setActiveTab("location");

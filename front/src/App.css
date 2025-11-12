@@ -120,7 +120,7 @@
   font-weight: 700;
   color: white;
   text-align: center;
-  margin: 0 0 -100px 0;
+  margin: 0 0 -65px 0;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   line-height: 2.0;
 }
@@ -391,7 +391,7 @@
 .welcome-header {
   background: linear-gradient(135deg, #E8D5FF 0%, #FFD5E8 100%);
   border-radius: 16px;
-  padding: 24px 20px;
+  padding: 12px 20px;
   margin-bottom: 24px;
   position: relative;
 }

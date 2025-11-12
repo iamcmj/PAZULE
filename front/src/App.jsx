@@ -333,31 +333,8 @@ function App() {
               <img src={logoImage} alt="PAZULE" className="intro-logo" />
             </div>
 
-            {/* 파주를 탐험하세요 버튼 */}
-            <button className="explore-btn" onClick={() => setStep("select")}>
-              <SparkleIcon />
-              <span>파주를 탐험하세요</span>
-            </button>
-
             {/* 메인 타이틀 */}
-            <h1 className="intro-main-title">오늘의 미션을 시작해보세요</h1>
-            <p className="intro-subtitle">키워드를 찾아 미션을 완료하고 특별한 쿠폰을 받아가세요!</p>
-
-            {/* 미션 타입 버튼들 */}
-            <div className="intro-mission-buttons">
-              <button className="intro-mission-btn photo-btn" onClick={() => { setMissionType("photo"); setStep("select"); }}>
-                <CameraIcon />
-                <span>사진 촬영</span>
-              </button>
-              <button className="intro-mission-btn location-btn" onClick={() => { setMissionType("location"); setStep("select"); }}>
-                <MapPinIcon />
-                <span>장소 찾기</span>
-              </button>
-              <button className="intro-mission-btn coupon-btn" onClick={() => setStep("select")}>
-                <TrophyIcon />
-                <span>쿠폰 받기</span>
-              </button>
-            </div>
+            <h1 className="intro-main-title">미션을 완료하고 특별한 쿠폰을 받아가세요 !</h1>
 
             {/* 시작하기 버튼 */}
             <button className="intro-start-btn" onClick={() => {

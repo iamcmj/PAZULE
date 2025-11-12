@@ -39,7 +39,6 @@ def make_prompts_from_keywords(keywords, templates=None):
 
     return prompts
 
-
 def analyze_mood(image, keywords, top):
     prompts = make_prompts_from_keywords(keywords)
     inputs = clip_processor(
@@ -52,48 +51,18 @@ def analyze_mood(image, keywords, top):
 
     topk = torch.topk(probs, k=top)
     top_keywords = []
-    scores = []
 
-    for idx, score in zip(topk.indices[0].tolist(), topk.values[0].tolist()):
+    for idx in topk.indices[0].tolist():
         match = re.search(r"conveys a (.+?) mood", prompts[idx])
         kw = match.group(1)
         top_keywords.append(kw)
-        scores.append(f"{score*100:.1f}")
 
-    return top_keywords, scores
-
+    return top_keywords
 
 def find_mood(target):
     for key, values in keyword_mapping.items():
         if target in values:
             return key
-
-def make_answer(state, kw, top_mood, top_mood_specific):
-    if state == "perfect":
-        result = f"완벽합니다!!🥳 {kw} 느낌을 아주 잘 담으셨어요!"
-        
-    elif state == "good":
-        result = f"훌륭합니다☺️ {kw} 느낌이 잘 담겨 있습니다!"
-        
-    elif state == "not_bad":
-        result = f"조금만 더 {kw} 느낌을 담아 보세요🙂 현재는 {top_mood[0]} 느낌이 더 강합니다!\n"
-        result += f"현재 이 사진으로부터 강하게 인식한 키워드 2개는 다음과 같습니다!\n"
-        for i, m in enumerate(top_mood_specific):
-            result += f"{i+1}. {m}({top_mood[i]})\n"
-            if i == 1:
-                break
-
-    elif state == "bad":
-        result = f"아쉽습니다...🥲 {kw} 감성이 잘 보이지 않습니다.\n"
-        result += f"현재 이 사진으로부터 인식한 키워드는 다음과 같습니다.\n"
-        for i, m in enumerate(top_mood_specific):
-            result += f"{i+1}. {m}({top_mood[i]})\n"
-        result += f"\n💡 {feedback_guide[kw]['desc']}\n\n"
-        result += "📷 이러한 키워드를 참고해보세요:\n"
-        for eng, kor in feedback_guide[kw]["keywords"].items():
-            result += f" - {kor}\n"
-    
-    return result
 
 def check_with_clip(image, kw):
     """
@@ -121,9 +90,10 @@ def check_with_clip(image, kw):
     result = ""
     top_mood = []
     top_mood_specific = []
+    clip_info = []
 
     if kw in kw_strong:
-        top_keywords, scores = analyze_mood(pil_image, label_pairs, 5)
+        top_keywords = analyze_mood(pil_image, label_pairs, 5)
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
@@ -131,18 +101,16 @@ def check_with_clip(image, kw):
 
         # 성공 여부 판단
         if top_mood[0] == kw and top_mood[1] == kw:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
             is_success = True
         elif top_mood[0] == kw or sum(k == kw for k in top_mood) >= 3:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
             is_success = True
         elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+            is_success = False
         else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
+            is_success = False
 
     elif kw in kw_middle:
-        top_keywords, scores = analyze_mood(pil_image, label_pairs, 7)
+        top_keywords = analyze_mood(pil_image, label_pairs, 7)
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
@@ -150,18 +118,16 @@ def check_with_clip(image, kw):
 
         # 성공 여부 판단
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:5]) >= 2:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
             is_success = True
         elif sum(k == kw for k in top_mood) >= 2:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
             is_success = True
         elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+            is_success = False
         else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
+            is_success = False
 
     elif kw in kw_weak:
-        top_keywords, scores = analyze_mood(pil_image, label_pairs, 9)
+        top_keywords = analyze_mood(pil_image, label_pairs, 9)
 
         for key in top_keywords:
             top_mood.append(find_mood(key))
@@ -169,17 +135,13 @@ def check_with_clip(image, kw):
 
         # 성공 여부 판단
         if top_mood[0] == kw or sum(k == kw for k in top_mood[:7]) >= 2:
-            result = make_answer("perfect", kw, top_mood, top_mood_specific)
             is_success = True
         elif kw in top_mood[:7]:
-            result = make_answer("good", kw, top_mood, top_mood_specific)
             is_success = True
         elif kw in top_mood:
-            result = make_answer("not_bad", kw, top_mood, top_mood_specific)
+            is_success = False
         else:
-            result = make_answer("bad", kw, top_mood, top_mood_specific)
-
-    print(result)
+            is_success = False
     
     # 감정 정보 반환 (힌트 생성용)
     clip_info = top_mood[:3] if not is_success else []
@@ -194,4 +156,5 @@ if __name__ == "__main__":
     image_path = os.path.join(PROJECT_ROOT, "data", "지혜의숲 조각상", "IMG_9802.jpg")
     image = Image.open(image_path).convert("RGB")
 
-    check_with_clip(image, kw)
+    is_success, clip_info = check_with_clip(image, kw)
+    print(is_success, clip_info)

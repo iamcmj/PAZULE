@@ -1,7 +1,7 @@
 # mission_manager.py
 from models.blip_module import check_with_blip
 from models.clip_module import check_with_clip
-from models.llm_hint_generator import generate_hint
+from models.llm_hint_generator import generate_blip_hint, generate_clip_hint
 from coupon_manager import give_coupon
 
 

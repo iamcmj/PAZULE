@@ -2,7 +2,6 @@
 import os
 import re
 import sys
-import json
 import torch
 from PIL import Image
 
@@ -107,9 +106,11 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
             moods = ', '.join(detected_top_moods)
         else:
             detected_top_moods = top_mood
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
             moods = ', '.join(detected_top_moods)
 
     elif kw in kw_middle:
@@ -126,10 +127,12 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
+            moods = ', '.join(filtered_moods)
         else:
             detected_top_moods = top_mood
-            moods = ', '.join(detected_top_moods)
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
+            moods = ', '.join(filtered_moods)
 
     elif kw in kw_weak:
         top_keywords = analyze_mood(pil_image, label_pairs, 9)
@@ -145,17 +148,19 @@ def check_with_clip(image, kw):
             is_success = True
         elif kw in top_mood:
             detected_top_moods = top_mood[:3]
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
             moods = ', '.join(detected_top_moods)
         else:
             detected_top_moods = top_mood
+            filtered_moods = [mood for mood in detected_top_moods if mood != kw]
             moods = ', '.join(detected_top_moods)
     
     # 감정 정보 반환 (힌트 생성용)
     if not is_success:
         clip_info.append({
-            f"질문: 이 장소에서 {kw} 분위기가 느껴지나요?",
-            f"model answer: 아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
-            f"expected answer: 네, 이 장소는 {kw} 분위기가 느껴져요."
+            "question": f"이 장소에서 {kw} 분위기가 느껴지나요?",
+            "model answer": f"아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
+            "expected answer": f"네, 이 장소는 {kw} 분위기가 느껴져요.",
         })
     return is_success, clip_info
         

@@ -119,7 +119,7 @@ def generate_blip_hint(answer, blip_failed_questions=None):
 
 
 
-def generate_clip_hint(answer, clip_info, status_msg):
+def generate_clip_hint(answer, clip_info):
 
     # API 키 확인
     api_key = os.getenv("OPENAI_API_KEY")
@@ -139,6 +139,7 @@ def generate_clip_hint(answer, clip_info, status_msg):
 
     # 시스템 프롬프트
     system_prompt = """당신은 파주 출판단지 보물찾기 게임의 힌트 제공자입니다."""
+    print('\n', clip_info, '\n')
 
     # 사용자 프롬프트
     user_prompt = f"""정답 랜드마크: {answer}{failed_info}위 정보를 바탕으로 사용자가 정답에 더 가까이 다가갈 수 있도록 추상적이고 창의적인 힌트를 생성해주세요."""

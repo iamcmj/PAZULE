@@ -119,6 +119,61 @@ def get_today_hint():
         return jsonify({"answer": today_answer1, "hint": today_hint1})
 
 
+@app.route("/api/preview", methods=["POST"])
+def api_preview():
+    """HEIC 파일을 JPG로 변환하여 미리보기 제공"""
+    if "image" not in request.files:
+        return jsonify({"error": "이미지 파일이 필요합니다."}), 400
+
+    file = request.files["image"]
+    if file.filename == "":
+        return jsonify({"error": "이미지 파일이 선택되지 않았습니다."}), 400
+
+    # ✅ 임시 파일로 저장
+    import tempfile
+    from PIL import Image
+    from pillow_heif import register_heif_opener
+    import io
+
+    # HEIC 포맷 지원 등록
+    register_heif_opener()
+
+    with tempfile.NamedTemporaryFile(
+        delete=False, suffix=os.path.splitext(file.filename)[1]
+    ) as tmp_file:
+        file.save(tmp_file.name)
+        temp_path = tmp_file.name
+
+    try:
+        # HEIC 파일을 JPG로 변환
+        img = Image.open(temp_path)
+        img_rgb = img.convert("RGB")
+
+        # 메모리 버퍼에 JPG 저장
+        output = io.BytesIO()
+        img_rgb.save(output, format="JPEG", quality=90)
+        output.seek(0)
+
+        from flask import send_file
+
+        return send_file(
+            output,
+            mimetype="image/jpeg",
+            as_attachment=False,
+            download_name="preview.jpg",
+        )
+    except Exception as e:
+        print(f"미리보기 변환 오류: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        # ✅ 임시 파일 삭제
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
 @app.route("/api/mission", methods=["POST"])
 def api_mission():
     """미션 실행 API - mission_type에 따라 적절한 미션 실행"""
@@ -137,19 +192,22 @@ def api_mission():
 
     # ✅ 파일 확장자 확인 및 HEIC 지원
     file_ext = os.path.splitext(file.filename)[1].lower()
-    allowed_extensions = ['.jpg', '.jpeg', '.png', '.heic', '.heif']
-    
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".heic", ".heif"]
+
     if file_ext not in allowed_extensions:
-        return jsonify({
-            "error": f"지원하지 않는 파일 형식입니다. 지원 형식: {', '.join(allowed_extensions)}"
-        }), 400
+        return (
+            jsonify(
+                {
+                    "error": f"지원하지 않는 파일 형식입니다. 지원 형식: {', '.join(allowed_extensions)}"
+                }
+            ),
+            400,
+        )
 
     # ✅ 임시 파일로 저장 (HEIC 파일도 원본 확장자 유지)
     import tempfile
 
-    with tempfile.NamedTemporaryFile(
-        delete=False, suffix=file_ext
-    ) as tmp_file:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_file:
         file.save(tmp_file.name)
         temp_path = tmp_file.name
 

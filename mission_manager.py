@@ -30,7 +30,7 @@ def run_mission1(user_image, answer):
     else:
         # 실패 - 힌트 생성
         status_msg = "장소를 다시 찾아보세요!"
-        hint = generate_hint(answer, blip_info, [], status_msg)
+        hint = generate_blip_hint(answer, blip_info, status_msg)
         return {
             "success": False,
             "hint": hint,
@@ -64,7 +64,7 @@ def run_mission2(user_image, answer):
     else:
         # 실패 - 힌트 생성
         status_msg = "감정이 담긴 사진을 다시 찍어보세요!"
-        hint = generate_hint(answer, [], clip_info, status_msg)
+        hint = generate_clip_hint(answer, clip_info, status_msg)
         return {
             "success": False,
             "hint": hint,

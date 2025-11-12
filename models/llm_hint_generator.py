@@ -117,6 +117,58 @@ def generate_blip_hint(answer, blip_failed_questions=None):
         return f"다시 한 번 주변을 둘러보세요. '{answer}'와 관련된 특별한 장소가 있을 거예요! 💡"
 
 
+
+
+def generate_clip_hint(answer, clip_info, status_msg):
+
+    # API 키 확인
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        print("⚠️ OPENAI_API_KEY가 설정되지 않았습니다. 기본 힌트를 사용합니다.")
+        return f"다시 한 번 주변을 둘러보세요. '{answer}'와 관련된 특별한 장소가 있을 거예요! 💡"
+
+    # clip_info 
+    '''
+        틀렸을시 : 
+            # 감정 정보 반환 (힌트 생성용)
+            f"질문: 이 장소에서 {kw} 분위기가 느껴지나요?",
+            f"model answer: 아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
+            f"expected answer: 네, 이 장소는 {kw} 분위기가 느껴져요."
+    '''
+    failed_info = clip_info
+
+    # 시스템 프롬프트
+    system_prompt = """당신은 파주 출판단지 보물찾기 게임의 힌트 제공자입니다."""
+
+    # 사용자 프롬프트
+    user_prompt = f"""정답 랜드마크: {answer}{failed_info}위 정보를 바탕으로 사용자가 정답에 더 가까이 다가갈 수 있도록 추상적이고 창의적인 힌트를 생성해주세요."""
+
+    print(f"✅ LLM 힌트 생성 시도 (API 키 설정됨, 길이: {len(api_key)}자)")
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.7,  # 창의적인 힌트를 위해 높은 temperature 설정
+            max_tokens=200
+        )
+
+        hint = response.choices[0].message.content.strip()
+        print("✅ LLM 힌트 생성 성공")
+        return hint
+
+    except Exception as e:
+        print(f"❌ Error generating hint with GPT: {e}")
+        # 오류 발생 시 기본 힌트 반환
+        return f"다시 한 번 주변을 둘러보세요. '{answer}'와 관련된 특별한 장소가 있을 거예요! 💡"
+
+
+
+
+
 if __name__ == "__main__":
     # 테스트 예시
     print("=== LLM Hint Generator 테스트 ===\n")

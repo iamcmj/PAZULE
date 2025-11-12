@@ -60,85 +60,49 @@ function App() {
     const file = e.target.files[0];
     if (!file) return;
     
-    setImage(file);
     setResult(null);
     
-    // HEIC 파일 감지 (확장자 + MIME 타입 모두 확인)
+    // HEIC 파일 감지 (확장자 확인)
     const fileName = file.name.toLowerCase();
-    const fileType = file.type?.toLowerCase() || '';
-    const isHeic = 
-      fileName.endsWith('.heic') || 
-      fileName.endsWith('.heif') ||
-      fileType === 'image/heic' || 
-      fileType === 'image/heif';
+    const isHeic = fileName.endsWith('.heic') || fileName.endsWith('.heif');
     
-    console.log('파일 정보:', { fileName, fileType, isHeic });
+    // 파일을 state에 저장 (서버로 전송할 파일)
+    setImage(file);
     
+    // HEIC/HEIF 파일인 경우 서버에서 변환된 미리보기 가져오기
     if (isHeic) {
       try {
-        console.log('HEIC 파일 감지, 변환 시작...');
+        console.log('HEIC/HEIF 파일 감지, 서버에서 미리보기 변환 중...');
         
-        // heic2any 동적 import
-        const heic2anyModule = await import('heic2any');
-        const heic2any = heic2anyModule.default || heic2anyModule;
+        // 서버로 HEIC 파일 전송하여 JPG로 변환된 미리보기 받기
+        const formData = new FormData();
+        formData.append("image", file);
         
-        console.log('heic2any 모듈 로드 완료');
-        
-        // HEIC를 JPEG로 변환
-        const convertedBlob = await heic2any({
-          blob: file,
-          toType: 'image/jpeg',
-          quality: 0.8
+        const response = await fetch(`${API_ENDPOINT}/api/preview`, {
+          method: "POST",
+          body: formData,
         });
         
-        console.log('HEIC 변환 완료:', convertedBlob);
-        
-        // 변환된 첫 번째 이미지 사용 (heic2any는 배열 반환할 수 있음)
-        const jpegBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-        
-        if (!jpegBlob) {
-          throw new Error('변환된 이미지가 없습니다.');
+        if (response.ok) {
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onload = () => setPreview(reader.result);
+          reader.readAsDataURL(blob);
+          console.log('HEIC/HEIF → JPG 미리보기 변환 완료');
+        } else {
+          throw new Error('서버 변환 실패');
         }
-        
-        // Blob을 Data URL로 변환하여 미리보기
-        const reader = new FileReader();
-        reader.onerror = (err) => {
-          console.error('FileReader 오류:', err);
-          alert('이미지를 불러올 수 없습니다.');
-        };
-        reader.onload = () => {
-          console.log('미리보기 설정 완료');
-          setPreview(reader.result);
-        };
-        reader.readAsDataURL(jpegBlob);
-        
       } catch (error) {
-        console.error('HEIC 변환 실패:', error);
-        alert(`HEIC 파일 변환에 실패했습니다: ${error.message}\n\n일반 이미지(JPG, PNG)를 사용해주세요.`);
-        setImage(null);
+        console.error('HEIC 미리보기 변환 실패:', error);
+        // 변환 실패 시 기본 이미지 아이콘 표시
         setPreview(null);
-        // 파일 입력 초기화
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = "";
+        // 파일은 그대로 유지 (서버에서 처리 가능)
       }
     } else {
-      // 일반 이미지 파일 (JPEG, PNG 등)
-      try {
-        const reader = new FileReader();
-        reader.onerror = (err) => {
-          console.error('FileReader 오류:', err);
-          alert('이미지를 불러올 수 없습니다.');
-        };
-        reader.onload = () => {
-          setPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      } catch (error) {
-        console.error('이미지 로드 오류:', error);
-        alert('이미지를 불러올 수 없습니다.');
-        setImage(null);
-        setPreview(null);
-      }
+      // 일반 이미지 파일 (JPEG, PNG 등) - 직접 미리보기
+      const reader = new FileReader();
+      reader.onload = () => setPreview(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 

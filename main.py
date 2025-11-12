@@ -95,4 +95,4 @@ if __name__ == "__main__":
     # test_mission1(test_image, admin_choice1="피노키오")
 
     # Mission2 테스트
-    # test_mission2(test_image, admin_choice2="고요함")
+    test_mission2(test_image, admin_choice2="자연적인")

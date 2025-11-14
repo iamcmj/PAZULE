@@ -147,7 +147,6 @@ def generate_clip_hint(answer, clip_info):
             f"model answer: 아니요, 이 장소는 {moods} 분위기가 더 강하게 느껴져요.",
             f"expected answer: 네, 이 장소는 {kw} 분위기가 느껴져요."
     '''
-    print(failed_info)
 
     # 시스템 프롬프트
     system_prompt = """당신은 파주 출판단지 감성 찾기 게임의 힌트 제공자입니다.

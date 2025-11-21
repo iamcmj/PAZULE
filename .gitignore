@@ -13,7 +13,6 @@ dist/
 
 # Virtual environment
 .env
-.env/
 .venv/
 env/
 venv/

@@ -28,7 +28,7 @@ function App() {
     location: false
   });
 
-  const API_ENDPOINT = "http://localhost:8080";
+  const API_ENDPOINT = "http://192.168.219.104:8080";
 
   const introImages = [intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8];
 

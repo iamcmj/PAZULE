@@ -18,7 +18,7 @@ MODEL_NAME = "Salesforce/blip-vqa-base"
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(MODULE_DIR)
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-LANDMARK_QA_FILE = os.path.join(DATA_DIR, "landmark_qa_labeled.json")
+LANDMARK_QA_FILE = os.path.join(DATA_DIR, "landmark_qa_labeled_updated.json")
 
 # --- 미션 성공 기준 (75%) ---
 SUCCESS_THRESHOLD = 0.75
